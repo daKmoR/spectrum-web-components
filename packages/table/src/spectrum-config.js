@@ -1,4 +1,4 @@
-/*
+/* sepctrum config
 Copyright 2022 Adobe. All rights reserved.
 This file is licensed to you under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License. You may obtain a copy
@@ -45,6 +45,12 @@ const config = {
                             selector: '.spectrum-Table--spacious',
                         },
                     ],
+                },
+            ],
+            slots: [
+                {
+                    contents: 'sp-table-body',
+                    selector: '.spectrum-Table-body',
                 },
             ],
             exclude: [/\.spectrum-Table-sortedIcon/],
@@ -108,6 +114,33 @@ const config = {
                 /\.spectrum-Table--compact/,
                 /\.spectrum-Table-sortedIcon/,
             ],
+        },
+        {
+            name: 'table-checkbox-cell',
+            host: {
+                selector: '.spectrum-Table',
+            },
+            complexSelectors: [
+                {
+                    replacement: ':host([dir=ltr])',
+                    selector:
+                        '.spectrum-Table[dir=ltr] .spectrum-Table-checkboxCell',
+                },
+                {
+                    replacement: ':host([dir=rtl])',
+                    selector:
+                        '.spectrum-Table[dir=rtl] .spectrum-Table-checkboxCell',
+                },
+                {
+                    replacement: ':host',
+                    selector: '.spectrum-Table-checkboxCell',
+                },
+                {
+                    replacement: '.checkbox',
+                    selector: /.spectrum-Table-checkbox(?!Cell)/,
+                },
+            ],
+            exclude: [/\.spectrum-Table(?!-checkbox)/],
         },
         {
             name: 'table-head',

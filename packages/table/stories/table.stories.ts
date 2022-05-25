@@ -170,13 +170,10 @@ class VirtualTable extends SpectrumElement {
                     .items=${this.items}
                     .renderItem=${this.renderItem}
                     scroller?="true"
-                    .itemValue=${(item) => {
-                        return item.name;
-                    }}
                 ></sp-table-body>
             </sp-table>
         `;
-    }
+    } // .itemValue=${(item) => {return item.name}} <-- but this in sptablebody
 }
 
 customElements.define('virtual-table', VirtualTable);
