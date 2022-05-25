@@ -30,8 +30,8 @@ export class TableCell extends SpectrumElement {
     @property({ reflect: true })
     public role = 'gridcell';
 
-    // @property({ type: Number, reflect: true })
-    // public tabIndex = -1;
+    @property({ type: Number, reflect: true })
+    public tabIndex = -1;
 
     protected render(): TemplateResult {
         return html`

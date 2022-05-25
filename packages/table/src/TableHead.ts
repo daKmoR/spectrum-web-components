@@ -33,6 +33,8 @@ export class TableHead extends SpectrumElement {
 
     public childCells = [] as TableHeadCell[];
 
+    public selectable?: boolean;
+
     private handleSorted({ target }: Event): void {
         const childCells = [...this.children] as TableHeadCell[];
         childCells.forEach((cell) => {
@@ -48,3 +50,8 @@ export class TableHead extends SpectrumElement {
         `;
     }
 }
+
+// ${this.selectable
+//     ? html`<sp-table-checkbox-cell></sp-table-checkbox-cell>`
+//     : html``
+// }

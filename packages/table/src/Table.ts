@@ -1,4 +1,4 @@
-/*
+/* TABLE
 Copyright 2022 Adobe. All rights reserved.
 This file is licensed to you under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License. You may obtain a copy
@@ -12,13 +12,16 @@ governing permissions and limitations under the License.
 import {
     CSSResultArray,
     html,
+    PropertyValues,
     SpectrumElement,
     TemplateResult,
 } from '@spectrum-web-components/base';
 import { property } from '@spectrum-web-components/base/src/decorators.js';
 
 import styles from './table.css.js';
+import { TableHead } from './TableHead.js';
 import type { TableHeadCell } from './TableHeadCell.js';
+// import { TableRow } from './TableRow.js';
 
 /**
  * @element sp-table
@@ -32,7 +35,11 @@ export class Table extends SpectrumElement {
     @property({ reflect: true })
     public role = 'grid';
 
-    public childCells = [];
+    @property({ type: String, reflect: true })
+    public selects: undefined | 'single' | 'multiple';
+
+    @property({ type: Array })
+    public selected: string[] = [];
 
     public focus(): void {
         const sortableHeadCell = this.querySelector(
@@ -43,9 +50,27 @@ export class Table extends SpectrumElement {
         }
     }
 
+    // protected handleSelected({ target }: Event): void {
+    //     // get child cells that are selected
+    //     // put those into the value property
+    // }
+
+    protected handleSelects(): void {
+        const tableHead = this.querySelector('sp-table-head') as TableHead;
+        //const tableRows = [...this.querySelectorAll('sp-table-row')] as TableRow[];
+
+        tableHead.selectable = true;
+    }
+
     protected render(): TemplateResult {
         return html`
             <slot></slot>
         `;
+    }
+
+    protected willUpdate(changed: PropertyValues<this>): void {
+        if (changed.has('selects')) {
+            this.handleSelects();
+        }
     }
 }

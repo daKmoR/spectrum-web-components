@@ -33,6 +33,9 @@ export class TableRow extends SpectrumElement {
     // @property({ type: Number, reflect: true })
     // public tabIndex = -1;
 
+    @property({ type: String })
+    public value = '';
+
     protected render(): TemplateResult {
         return html`
             <slot></slot>

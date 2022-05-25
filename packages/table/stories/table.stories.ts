@@ -1,4 +1,4 @@
-/*
+/* STORIES
 Copyright 2022 Adobe. All rights reserved.
 This file is licensed to you under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License. You may obtain a copy
@@ -15,7 +15,6 @@ import {
     TemplateResult,
 } from '@spectrum-web-components/base';
 import { property } from '@spectrum-web-components/base/src/decorators.js';
-import { virtualize } from '@lit-labs/virtualizer/virtualize.js';
 
 import '../sp-table.js';
 import '../sp-table-head.js';
@@ -128,9 +127,18 @@ class VirtualTable extends SpectrumElement {
             }
         };
 
+    renderItem = (item: Item, index: number): TemplateResult => {
+        return html`
+            <sp-table-cell>Row Item Alpha ${item.name}</sp-table-cell>
+            <sp-table-cell>Row Item Alpha ${item.date}</sp-table-cell>
+            <sp-table-cell>Row Item Alpha ${index}</sp-table-cell>
+        `;
+    };
+
     protected render(): TemplateResult {
         return html`
             <sp-table
+                aria-rowcount="50"
                 size="m"
                 @sorted=${(event: CustomEvent<SortedEventDetails>): void => {
                     // const { sortby, sorted } = event.target; // sources the target, doesn't work across shadow boundaries
@@ -157,23 +165,15 @@ class VirtualTable extends SpectrumElement {
                     </sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
-                <sp-table-body style="height: 120px">
-                    ${virtualize({
-                        items: this.items,
-                        scroller: true,
-                        renderItem: ({ name, date }) => html`
-                            <sp-table-row>
-                                <sp-table-cell>
-                                    Row Item Alpha ${name}
-                                </sp-table-cell>
-                                <sp-table-cell>
-                                    Row Item Alpha ${date}
-                                </sp-table-cell>
-                                <sp-table-cell>Row Item Alpha</sp-table-cell>
-                            </sp-table-row>
-                        `,
-                    })}
-                </sp-table-body>
+                <sp-table-body
+                    style="height: 120px"
+                    .items=${this.items}
+                    .renderItem=${this.renderItem}
+                    scroller?="true"
+                    .itemValue=${(item) => {
+                        return item.name;
+                    }}
+                ></sp-table-body>
             </sp-table>
         `;
     }
@@ -199,3 +199,254 @@ ${repeat({
     `
 })}
 */
+
+interface Item extends Record<string, unknown> {
+    name: string;
+    date: number;
+}
+
+function makeItemsTwo(count: number): Item[] {
+    const total = count;
+    const items: Item[] = [];
+    while (count) {
+        count--;
+        items.push({
+            name: String(total - count),
+            date: count,
+        });
+    }
+    return items;
+}
+
+export const virtualizedTwo = (): TemplateResult => {
+    const virtualItems = makeItemsTwo(50);
+
+    const renderItem = (item: Item, index: number): TemplateResult => {
+        return html`
+            <sp-table-cell>Row Item Alpha ${item.name}</sp-table-cell>
+            <sp-table-cell>Row Item Alpha ${item.date}</sp-table-cell>
+            <sp-table-cell>Row Item Alpha ${index}</sp-table-cell>
+        `;
+    };
+
+    const sortItems =
+        (sortBy: 'name' | 'date', sorted: 'asc' | 'desc') =>
+        (a: Item, b: Item): number => {
+            const doSortBy = sortBy;
+            if (!isNaN(Number(a[doSortBy]))) {
+                const first = Number(a[doSortBy]);
+                const second = Number(b[doSortBy]);
+                return sorted === 'asc' ? first - second : second - first;
+            } else {
+                const first = String(a[doSortBy]);
+                const second = String(b[doSortBy]);
+                return sorted === 'asc'
+                    ? first.localeCompare(second)
+                    : second.localeCompare(first);
+            }
+        };
+
+    return html`
+        <sp-table
+            size="m"
+            @sorted=${(event: CustomEvent<SortedEventDetails>): void => {
+                const { sortBy, sorted } = event.detail; // leveraged CustomEvent().detail, works across shadow boundaries
+                const items = virtualItems;
+                // depending on the column, sort asc or desc depending on the arrow direction
+                items.sort(sortItems(sortBy as 'name' | 'date', sorted));
+            }}
+        >
+            <sp-table-head>
+                <sp-table-head-cell sortable sortby="name" sorted="desc">
+                    Column Title
+                </sp-table-head-cell>
+                <sp-table-head-cell sortable sortby="date">
+                    Column Title
+                </sp-table-head-cell>
+                <sp-table-head-cell>Column Title</sp-table-head-cell>
+            </sp-table-head>
+            <sp-table-body
+                style="height: 120px"
+                .items=${virtualItems}
+                .renderItem=${renderItem}
+                scroller?="true"
+            ></sp-table-body>
+        </sp-table>
+    `;
+};
+
+// export const notes = (): TemplateResult => {
+//     return html`
+//         <sp-table size="m" selects="single | multiple" selected=${values = String[]}>
+//             <sp-table-head>
+//                 <sp-table-head-cell sortable sorted="desc">
+//                     Column Title
+//                 </sp-table-head-cell>
+//                 <sp-table-head-cell sortable>Column Title</sp-table-head-cell>
+//                 <sp-table-head-cell>Column Title</sp-table-head-cell>
+//             </sp-table-head>
+//             <sp-table-body style="height: 120px">
+//                 <sp-table-row value="" selectable selected>
+//                     <sp-table-cell>Row Item Alpha</sp-table-cell>
+//                     <sp-table-cell>Row Item Alpha</sp-table-cell>
+//                     <sp-table-cell>Row Item Alpha</sp-table-cell>
+//                 </sp-table-row>
+//                 <sp-table-row value="" selectable>
+//                     <sp-table-cell>Row Item Bravo</sp-table-cell>
+//                     <sp-table-cell>Row Item Bravo</sp-table-cell>
+//                     <sp-table-cell>Row Item Bravo</sp-table-cell>
+//                 </sp-table-row>
+//                 <sp-table-row value="" selectable>
+//                     <sp-table-cell>Row Item Charlie</sp-table-cell>
+//                     <sp-table-cell>Row Item Charlie</sp-table-cell>
+//                     <sp-table-cell>Row Item Charlie</sp-table-cell>
+//                 </sp-table-row>
+//                 <sp-table-row value="" selectable>
+//                     <sp-table-cell>Row Item Delta</sp-table-cell>
+//                     <sp-table-cell>Row Item Delta</sp-table-cell>
+//                     <sp-table-cell>Row Item Delta</sp-table-cell>
+//                 </sp-table-row>
+//                 <sp-table-row value="" selectable>
+//                     <sp-table-cell>Row Item Echo</sp-table-cell>
+//                     <sp-table-cell>Row Item Echo</sp-table-cell>
+//                     <sp-table-cell>Row Item Echo</sp-table-cell>
+//                 </sp-table-row>
+//             </sp-table-body>
+//         </sp-table>
+//     `;
+// };
+
+export const selectsSingle = (): TemplateResult => {
+    return html`
+        <sp-table size="m" selects="single" .selected=${['row1']}>
+            <sp-table-head>
+                <sp-table-head-cell sortable sorted="desc">
+                    Column Title
+                </sp-table-head-cell>
+                <sp-table-head-cell sortable>Column Title</sp-table-head-cell>
+                <sp-table-head-cell>Column Title</sp-table-head-cell>
+            </sp-table-head>
+            <sp-table-body style="height: 120px">
+                <sp-table-row value="row1">
+                    <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    <sp-table-cell>Row Item Alpha</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row2">
+                    <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    <sp-table-cell>Row Item Bravo</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row3">
+                    <sp-table-cell>Row Item Charlie</sp-table-cell>
+                    <sp-table-cell>Row Item Charlie</sp-table-cell>
+                    <sp-table-cell>Row Item Charlie</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row4">
+                    <sp-table-cell>Row Item Delta</sp-table-cell>
+                    <sp-table-cell>Row Item Delta</sp-table-cell>
+                    <sp-table-cell>Row Item Delta</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row5">
+                    <sp-table-cell>Row Item Echo</sp-table-cell>
+                    <sp-table-cell>Row Item Echo</sp-table-cell>
+                    <sp-table-cell>Row Item Echo</sp-table-cell>
+                </sp-table-row>
+            </sp-table-body>
+        </sp-table>
+    `;
+};
+
+export const selectsMultiple = (): TemplateResult => {
+    return html`
+        <sp-table size="m" selects="multiple" .selected=${['row1', 'row2']}>
+            <sp-table-head>
+                <sp-table-head-cell sortable sorted="desc">
+                    Column Title
+                </sp-table-head-cell>
+                <sp-table-head-cell sortable>Column Title</sp-table-head-cell>
+                <sp-table-head-cell>Column Title</sp-table-head-cell>
+            </sp-table-head>
+            <sp-table-body style="height: 120px">
+                <sp-table-row value="row1">
+                    <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    <sp-table-cell>Row Item Alpha</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row2">
+                    <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    <sp-table-cell>Row Item Bravo</sp-table-cell>
+                </sp-table-row>
+            </sp-table-body>
+        </sp-table>
+    `;
+};
+
+/*
+        <sp-table size="m" selects="multiple" .selected=${["row1", "row2"]}>
+            <sp-table-head>
+                <sp-table-checkbox-cell></sp-table-checkbox-cell>
+                <sp-table-head-cell sortable sorted="desc">
+                    Column Title
+                </sp-table-head-cell>
+                <sp-table-head-cell sortable>Column Title</sp-table-head-cell>
+                <sp-table-head-cell>Column Title</sp-table-head-cell>
+            </sp-table-head>
+            <sp-table-body style="height: 120px">
+                <sp-table-row value="row1">
+                    <sp-table-checkbox-cell></sp-table-checkbox-cell>
+                    <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    <sp-table-cell>Row Item Alpha</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row2">
+                    <sp-table-checkbox-cell></sp-table-checkbox-cell>
+                    <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    <sp-table-cell>Row Item Bravo</sp-table-cell>
+                </sp-table-row>
+            </sp-table-body>
+        </sp-table>
+        */
+
+export const selectsMultipleAttributes = (): TemplateResult => {
+    return html`
+        <sp-table size="m" selects="multiple">
+            <sp-table-head>
+                <sp-table-head-cell sortable sorted="desc">
+                    Column Title
+                </sp-table-head-cell>
+                <sp-table-head-cell sortable>Column Title</sp-table-head-cell>
+                <sp-table-head-cell>Column Title</sp-table-head-cell>
+            </sp-table-head>
+            <sp-table-body style="height: 120px">
+                <sp-table-row value="row1" selected>
+                    <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    <sp-table-cell>Row Item Alpha</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row2">
+                    <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    <sp-table-cell>Row Item Bravo</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row3" selected>
+                    <sp-table-cell>Row Item Charlie</sp-table-cell>
+                    <sp-table-cell>Row Item Charlie</sp-table-cell>
+                    <sp-table-cell>Row Item Charlie</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row4">
+                    <sp-table-cell>Row Item Delta</sp-table-cell>
+                    <sp-table-cell>Row Item Delta</sp-table-cell>
+                    <sp-table-cell>Row Item Delta</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row5">
+                    <sp-table-cell>Row Item Echo</sp-table-cell>
+                    <sp-table-cell>Row Item Echo</sp-table-cell>
+                    <sp-table-cell>Row Item Echo</sp-table-cell>
+                </sp-table-row>
+            </sp-table-body>
+        </sp-table>
+    `;
+};
