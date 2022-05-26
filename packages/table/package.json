@@ -27,6 +27,8 @@
         "./sp-table-body.js": "./sp-table-body.js",
         "./sp-table-cell": "./sp-table-cell.js",
         "./sp-table-cell.js": "./sp-table-cell.js",
+        "./sp-table-checkbox-cell": "./sp-table-checkbox-cell.js",
+        "./sp-table-checkbox-cell.js": "./sp-table-checkbox-cell.js",
         "./sp-table-head": "./sp-table-head.js",
         "./sp-table-head.js": "./sp-table-head.js",
         "./sp-table-head-cell": "./sp-table-head-cell.js",
@@ -55,6 +57,7 @@
     ],
     "dependencies": {
         "@spectrum-web-components/base": "^0.5.5",
+        "@spectrum-web-components/checkbox": "^0.13.0",
         "@spectrum-web-components/icon": "^0.11.6",
         "@spectrum-web-components/icons-ui": "^0.8.6",
         "tslib": "^2.0.0"

@@ -21,7 +21,7 @@ import { property } from '@spectrum-web-components/base/src/decorators.js';
 import styles from './table.css.js';
 import { TableHead } from './TableHead.js';
 import type { TableHeadCell } from './TableHeadCell.js';
-// import { TableRow } from './TableRow.js';
+import { TableRow } from './TableRow.js';
 
 /**
  * @element sp-table
@@ -50,16 +50,54 @@ export class Table extends SpectrumElement {
         }
     }
 
-    // protected handleSelected({ target }: Event): void {
-    //     // get child cells that are selected
-    //     // put those into the value property
+    // private deselectCells(): void {
+    //     const selectedRows = [
+    //         ...this.querySelectorAll('[selected]'),
+    //     ] as TableRow[];
+
+    //     selectedRows.forEach((row) => {
+    //         row.selected = false;
+    //         row.tabIndex = -1;
+    //         row.setAttribute('aria-checked', 'false');
+    //     });
+
+    //     // TODO: handle selection/deselection for tableHead Checkbox, too
     // }
 
-    protected handleSelects(): void {
-        const tableHead = this.querySelector('sp-table-head') as TableHead;
-        //const tableRows = [...this.querySelectorAll('sp-table-row')] as TableRow[];
+    protected handleSelected(): void {
+        const selectedRows = [
+            ...this.querySelectorAll('sp-table-row[selected]'),
+        ] as TableRow[];
+        selectedRows.forEach((row) => {
+            this.selected.push(row.value);
+            row.selected = true;
+        });
+    }
 
-        tableHead.selectable = true;
+    protected handleSelects(): void {
+        // add or delete checkboxes
+        if (this.selects) {
+            const tableHead = this.querySelector('sp-table-head') as TableHead;
+            const tableRows = [
+                ...this.querySelectorAll('sp-table-row'),
+            ] as TableRow[];
+
+            tableHead.insertAdjacentElement(
+                'afterbegin',
+                document.createElement('sp-table-checkbox-cell')
+            );
+            tableRows.forEach((row) => {
+                row.insertAdjacentElement(
+                    'afterbegin',
+                    document.createElement('sp-table-checkbox-cell')
+                );
+            });
+        } else {
+            const checkboxes = this.querySelectorAll('sp-table-checkbox-cell');
+            checkboxes.forEach((box) => {
+                box.remove();
+            });
+        }
     }
 
     protected render(): TemplateResult {
@@ -71,6 +109,9 @@ export class Table extends SpectrumElement {
     protected willUpdate(changed: PropertyValues<this>): void {
         if (changed.has('selects')) {
             this.handleSelects();
+        }
+        if (changed.has('selected')) {
+            this.handleSelected();
         }
     }
 }

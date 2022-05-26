@@ -15,6 +15,10 @@ import {
     SpectrumElement,
     TemplateResult,
 } from '@spectrum-web-components/base';
+import '@spectrum-web-components/checkbox/sp-checkbox.js';
+import { property } from '@spectrum-web-components/base/src/decorators.js';
+import cellStyles from './table-cell.css.js';
+import headCellStyles from './table-head-cell.css.js';
 import styles from './table-checkbox-cell.css.js';
 
 /**
@@ -22,12 +26,44 @@ import styles from './table-checkbox-cell.css.js';
  */
 export class TableCheckboxCell extends SpectrumElement {
     public static get styles(): CSSResultArray {
-        return [styles];
+        return [cellStyles, headCellStyles, styles];
     }
+
+    @property({ reflect: true })
+    public role = 'gridcell';
+
+    @property({ type: Number, reflect: true })
+    public tabIndex = -1;
+
+    // do I need a change event here, or does the sp-checkbox take care of that for me?
 
     protected render(): TemplateResult {
         return html`
-            <slot></slot>
+            <sp-checkbox class="checkbox"></sp-checkbox>
         `;
     }
+
+    // protected firstUpdated(changes: PropertyValues): void {
+    //     super.firstUpdated(changes);
+    //     this.addEventListener('change', () => {
+    //         const checkbox = this.querySelector('sp-checkbox') as Checkbox;
+    //         if (checkbox.checked) {
+    //             this.dispatchEvent(new Event('change', {
+    //                 bubbles: true,
+    //                 cancelable: true,
+    //             }));
+    //         }
+    //     })
+    // }
+
+    // protected update(changes: PropertyValues): void {
+    //     if (changes.has('selected')) {
+    //         this.setAttribute('aria-checked', 'true');
+    //         this.dispatchEvent(new Event ('change', {
+    //             bubbles: true,
+    //             cancelable: true,
+    //         }));
+    //     }
+    //     super.update(changes);
+    // }
 }

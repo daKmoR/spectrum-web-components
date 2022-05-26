@@ -44,14 +44,23 @@ export class TableHead extends SpectrumElement {
         });
     }
 
+    // private handleSelectAll({ target }: Event): void {
+    //     const childCells = [this.child]
+    // }
+
     protected render(): TemplateResult {
         return html`
             <slot @sorted=${this.handleSorted}></slot>
         `;
     }
-}
 
-// ${this.selectable
-//     ? html`<sp-table-checkbox-cell></sp-table-checkbox-cell>`
-//     : html``
-// }
+    // protected update(changes: PropertyValues): void {
+    //     if (changes.has('sorted')) {
+    //         this.setAttribute('aria-sort', ariaSortValue(this.sorted));
+    //     }
+    //     if (changes.has('sortable')) {
+    //         this.tabIndex = this.sortable ? 0 : -1;
+    //     }
+    //     super.update(changes);
+    // }
+}

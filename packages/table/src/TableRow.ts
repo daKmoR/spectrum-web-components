@@ -12,12 +12,17 @@ governing permissions and limitations under the License.
 import {
     CSSResultArray,
     html,
+    PropertyValues,
     SpectrumElement,
     TemplateResult,
 } from '@spectrum-web-components/base';
-import { property } from '@spectrum-web-components/base/src/decorators.js';
-
+import {
+    property,
+    query,
+} from '@spectrum-web-components/base/src/decorators.js';
+import { Checkbox } from '@spectrum-web-components/checkbox';
 import styles from './table-row.css.js';
+import { TableCheckboxCell } from './TableCheckboxCell.js';
 
 /**
  * @element sp-table
@@ -33,12 +38,42 @@ export class TableRow extends SpectrumElement {
     // @property({ type: Number, reflect: true })
     // public tabIndex = -1;
 
+    @query('.checkbox')
+    public checkboxCell!: TableCheckboxCell;
+
+    @property({ type: Boolean, reflect: true })
+    public selected = false;
+
     @property({ type: String })
     public value = '';
+
+    protected manageSelected(): void {
+        // get the value of "checked" from the sp-checkbox please kill me
+        const checkbox = this.checkboxCell.querySelector(
+            'sp-checkbox'
+        ) as Checkbox;
+        if (checkbox.checked) {
+            this.selected = true;
+        } else {
+            this.selected = false;
+        }
+    }
 
     protected render(): TemplateResult {
         return html`
             <slot></slot>
         `;
+    }
+
+    protected firstUpdated(changes: PropertyValues): void {
+        super.firstUpdated(changes);
+        this.addEventListener('change', this.manageSelected);
+    }
+
+    protected updated(changes: PropertyValues): void {
+        if (changes.has('selected')) {
+            this.manageSelected();
+        }
+        super.update(changes);
     }
 }

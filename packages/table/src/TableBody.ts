@@ -49,6 +49,8 @@ export class TableBody extends LitVirtualizer {
         return super.renderItem;
     }
 
+    // do we want to include "selected/selectable" here and render it? Or do we want to
+    // do that in TableRow?
     set renderItem(fn: (item: unknown, index: number) => TemplateResult) {
         super.renderItem = (
             item: Record<string, unknown>,

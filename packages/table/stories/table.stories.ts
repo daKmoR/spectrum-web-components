@@ -17,6 +17,7 @@ import {
 import { property } from '@spectrum-web-components/base/src/decorators.js';
 
 import '../sp-table.js';
+import '../sp-table-checkbox-cell.js';
 import '../sp-table-head.js';
 import '../sp-table-head-cell.js';
 import '../sp-table-body.js';
@@ -383,7 +384,6 @@ export const selectsMultiple = (): TemplateResult => {
 /*
         <sp-table size="m" selects="multiple" .selected=${["row1", "row2"]}>
             <sp-table-head>
-                <sp-table-checkbox-cell></sp-table-checkbox-cell>
                 <sp-table-head-cell sortable sorted="desc">
                     Column Title
                 </sp-table-head-cell>
