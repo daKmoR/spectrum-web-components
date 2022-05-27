@@ -357,7 +357,12 @@ export const selectsSingle = (): TemplateResult => {
 
 export const selectsMultiple = (): TemplateResult => {
     return html`
-        <sp-table size="m" selects="multiple" .selected=${['row1', 'row2']}>
+        <sp-table
+            size="m"
+            selects="multiple"
+            .selected=${['row1', 'row2']}
+            @change=${() => console.log('table changed!')}
+        >
             <sp-table-head>
                 <sp-table-head-cell sortable sorted="desc">
                     Column Title
@@ -375,6 +380,21 @@ export const selectsMultiple = (): TemplateResult => {
                     <sp-table-cell>Row Item Bravo</sp-table-cell>
                     <sp-table-cell>Row Item Bravo</sp-table-cell>
                     <sp-table-cell>Row Item Bravo</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row3">
+                    <sp-table-cell>Row Item Charlie</sp-table-cell>
+                    <sp-table-cell>Row Item Charlie</sp-table-cell>
+                    <sp-table-cell>Row Item Charlie</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row4">
+                    <sp-table-cell>Row Item Delta</sp-table-cell>
+                    <sp-table-cell>Row Item Delta</sp-table-cell>
+                    <sp-table-cell>Row Item Delta</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row5">
+                    <sp-table-cell>Row Item Echo</sp-table-cell>
+                    <sp-table-cell>Row Item Echo</sp-table-cell>
+                    <sp-table-cell>Row Item Echo</sp-table-cell>
                 </sp-table-row>
             </sp-table-body>
         </sp-table>

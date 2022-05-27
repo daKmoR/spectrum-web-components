@@ -18,7 +18,7 @@ import {
 } from '@spectrum-web-components/base';
 import {
     property,
-    query,
+    // query,
 } from '@spectrum-web-components/base/src/decorators.js';
 import { Checkbox } from '@spectrum-web-components/checkbox';
 import styles from './table-row.css.js';
@@ -35,28 +35,33 @@ export class TableRow extends SpectrumElement {
     @property({ reflect: true })
     public role = 'row';
 
-    // @property({ type: Number, reflect: true })
-    // public tabIndex = -1;
-
-    @query('.checkbox')
-    public checkboxCell!: TableCheckboxCell;
-
     @property({ type: Boolean, reflect: true })
     public selected = false;
 
     @property({ type: String })
     public value = '';
 
+    protected handleChange(): void {
+        // get the value of "checked" from the sp-checkbox
+        const checkboxCell = this.querySelector(
+            'sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
+        if (!checkboxCell) return;
+
+        // doesn't get it... works in devtools
+        const checkbox = checkboxCell.shadowRoot.children[0] as Checkbox;
+        if (!checkbox) return;
+
+        this.selected = checkbox.checked;
+    }
+
     protected manageSelected(): void {
-        // get the value of "checked" from the sp-checkbox please kill me
-        const checkbox = this.checkboxCell.querySelector(
-            'sp-checkbox'
-        ) as Checkbox;
-        if (checkbox.checked) {
-            this.selected = true;
-        } else {
-            this.selected = false;
-        }
+        const checkboxCell = this.querySelector(
+            'sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
+        if (!checkboxCell) return;
+
+        checkboxCell.selected = this.selected;
     }
 
     protected render(): TemplateResult {
@@ -65,15 +70,17 @@ export class TableRow extends SpectrumElement {
         `;
     }
 
+    // I want this to listen for the change on a checkbox Cell and to update
+    // its selected state accordingly.
     protected firstUpdated(changes: PropertyValues): void {
         super.firstUpdated(changes);
-        this.addEventListener('change', this.manageSelected);
+        // cache a ref to checkbox cell here bc DOM is current
+        this.addEventListener('change', this.handleChange);
     }
 
-    protected updated(changes: PropertyValues): void {
-        if (changes.has('selected')) {
+    protected willUpdate(changed: PropertyValues<this>): void {
+        if (changed.has('selected')) {
             this.manageSelected();
         }
-        super.update(changes);
     }
 }

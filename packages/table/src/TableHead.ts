@@ -54,6 +54,9 @@ export class TableHead extends SpectrumElement {
         `;
     }
 
+    // I want this to listen for the change on a checkbox Cell and to update
+    // its selected state accordingly.
+
     // protected update(changes: PropertyValues): void {
     //     if (changes.has('sorted')) {
     //         this.setAttribute('aria-sort', ariaSortValue(this.sorted));

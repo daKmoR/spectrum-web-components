@@ -12,14 +12,19 @@ governing permissions and limitations under the License.
 import {
     CSSResultArray,
     html,
+    // PropertyValues,
     SpectrumElement,
     TemplateResult,
 } from '@spectrum-web-components/base';
 import '@spectrum-web-components/checkbox/sp-checkbox.js';
-import { property } from '@spectrum-web-components/base/src/decorators.js';
+import {
+    property,
+    query,
+} from '@spectrum-web-components/base/src/decorators.js';
 import cellStyles from './table-cell.css.js';
 import headCellStyles from './table-head-cell.css.js';
 import styles from './table-checkbox-cell.css.js';
+import { Checkbox } from '@spectrum-web-components/checkbox';
 
 /**
  * @element sp-table
@@ -35,35 +40,34 @@ export class TableCheckboxCell extends SpectrumElement {
     @property({ type: Number, reflect: true })
     public tabIndex = -1;
 
+    // query for the checkbox itself so we can access its properties... Or am I just
+    // redoing work that exists on the checkbox itself? Whatever.
+    @query('.checkbox')
+    protected checkbox!: Checkbox;
+
+    @property({ type: Boolean })
+    public selected = false;
+
     // do I need a change event here, or does the sp-checkbox take care of that for me?
+
+    // If the checkbox cell is in the TableHead, it's going to have different behaviour...
+    // How can we make that distinction ?
 
     protected render(): TemplateResult {
         return html`
-            <sp-checkbox class="checkbox"></sp-checkbox>
+            <sp-checkbox
+                ?checked=${this.selected}
+                @change=${() => {
+                    this.dispatchEvent(
+                        new Event('change', {
+                            bubbles: true,
+                            cancelable: true,
+                            composed: true,
+                        })
+                    );
+                }}
+                class="checkbox"
+            ></sp-checkbox>
         `;
     }
-
-    // protected firstUpdated(changes: PropertyValues): void {
-    //     super.firstUpdated(changes);
-    //     this.addEventListener('change', () => {
-    //         const checkbox = this.querySelector('sp-checkbox') as Checkbox;
-    //         if (checkbox.checked) {
-    //             this.dispatchEvent(new Event('change', {
-    //                 bubbles: true,
-    //                 cancelable: true,
-    //             }));
-    //         }
-    //     })
-    // }
-
-    // protected update(changes: PropertyValues): void {
-    //     if (changes.has('selected')) {
-    //         this.setAttribute('aria-checked', 'true');
-    //         this.dispatchEvent(new Event ('change', {
-    //             bubbles: true,
-    //             cancelable: true,
-    //         }));
-    //     }
-    //     super.update(changes);
-    // }
 }

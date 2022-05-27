@@ -41,6 +41,8 @@ export class Table extends SpectrumElement {
     @property({ type: Array })
     public selected: string[] = [];
 
+    private selectedSet = new Set<string>();
+
     public focus(): void {
         const sortableHeadCell = this.querySelector(
             'sp-table-head-cell[sortable]'
@@ -64,16 +66,7 @@ export class Table extends SpectrumElement {
     //     // TODO: handle selection/deselection for tableHead Checkbox, too
     // }
 
-    protected handleSelected(): void {
-        const selectedRows = [
-            ...this.querySelectorAll('sp-table-row[selected]'),
-        ] as TableRow[];
-        selectedRows.forEach((row) => {
-            this.selected.push(row.value);
-            row.selected = true;
-        });
-    }
-
+    // We create/delete checkbox cells here.
     protected handleSelects(): void {
         // add or delete checkboxes
         if (this.selects) {
@@ -91,6 +84,7 @@ export class Table extends SpectrumElement {
                     'afterbegin',
                     document.createElement('sp-table-checkbox-cell')
                 );
+                row.selected = this.selectedSet.has(row.value);
             });
         } else {
             const checkboxes = this.querySelectorAll('sp-table-checkbox-cell');
@@ -100,18 +94,46 @@ export class Table extends SpectrumElement {
         }
     }
 
+    // Do we handle the actual selection here?
+    // What if we just listen for events happening on child elements?
+
+    protected handleSelected(): void {
+        const selectedRows = [
+            ...this.querySelectorAll('sp-table-row[selected]'),
+        ] as TableRow[];
+        selectedRows.forEach((row) => {
+            this.selected.push(row.value);
+            row.selected = true;
+        });
+    }
+
+    protected handleChange(event: Event): void {
+        // What changed (checkbox checked/unchecked)? Where did it change?
+        const { target } = event;
+        const { parentElement: item } = target as HTMLElement & {
+            parentElement: TableRow;
+        };
+        // Condition the row's value into the selected array
+        if (item.selected) {
+            this.selectedSet.add(item.value);
+        } else {
+            this.selectedSet.delete(item.value);
+        }
+        this.selected = [...this.selectedSet];
+    }
+
     protected render(): TemplateResult {
         return html`
-            <slot></slot>
+            <slot @change=${this.handleChange}></slot>
         `;
     }
 
     protected willUpdate(changed: PropertyValues<this>): void {
+        if (!this.hasUpdated) {
+            this.selectedSet = new Set(this.selected);
+        }
         if (changed.has('selects')) {
             this.handleSelects();
-        }
-        if (changed.has('selected')) {
-            this.handleSelected();
         }
     }
 }
