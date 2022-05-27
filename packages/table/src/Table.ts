@@ -52,24 +52,25 @@ export class Table extends SpectrumElement {
         }
     }
 
-    // private deselectCells(): void {
-    //     const selectedRows = [
-    //         ...this.querySelectorAll('[selected]'),
-    //     ] as TableRow[];
+    private deselectCells(): void {
+        const selectedRows = [
+            ...this.querySelectorAll('[selected]'),
+        ] as TableRow[];
 
-    //     selectedRows.forEach((row) => {
-    //         row.selected = false;
-    //         row.tabIndex = -1;
-    //         row.setAttribute('aria-checked', 'false');
-    //     });
+        selectedRows.forEach((row) => {
+            row.selected = false;
+            row.tabIndex = -1;
+            row.setAttribute('aria-checked', 'false');
+        });
 
-    //     // TODO: handle selection/deselection for tableHead Checkbox, too
-    // }
+        this.selectedSet.clear();
+        // TODO: handle selection/deselection for tableHead Checkbox, too
+    }
 
     // We create/delete checkbox cells here.
     protected handleSelects(): void {
         // add or delete checkboxes
-        if (this.selects) {
+        if (this.selects === 'multiple') {
             const tableHead = this.querySelector('sp-table-head') as TableHead;
             const tableRows = [
                 ...this.querySelectorAll('sp-table-row'),
@@ -86,6 +87,25 @@ export class Table extends SpectrumElement {
                 );
                 row.selected = this.selectedSet.has(row.value);
             });
+        } else if (this.selects === 'single') {
+            const tableHead = this.querySelector('sp-table-head') as TableHead;
+            const tableRows = [
+                ...this.querySelectorAll('sp-table-row'),
+            ] as TableRow[];
+
+            tableHead.insertAdjacentElement(
+                'afterbegin',
+                document.createElement('sp-table-checkbox-cell')
+            );
+            tableRows.forEach((row) => {
+                row.insertAdjacentElement(
+                    'afterbegin',
+                    document.createElement('sp-table-checkbox-cell')
+                );
+                // make sure we're not duplicating values!
+                row.selected = this.selectedSet.has(row.value);
+            });
+            // if selects = 'single', but multiple entries are selected, what do?
         } else {
             const checkboxes = this.querySelectorAll('sp-table-checkbox-cell');
             checkboxes.forEach((box) => {
@@ -94,32 +114,39 @@ export class Table extends SpectrumElement {
         }
     }
 
-    // Do we handle the actual selection here?
-    // What if we just listen for events happening on child elements?
-
-    protected handleSelected(): void {
-        const selectedRows = [
-            ...this.querySelectorAll('sp-table-row[selected]'),
-        ] as TableRow[];
-        selectedRows.forEach((row) => {
-            this.selected.push(row.value);
-            row.selected = true;
-        });
-    }
-
     protected handleChange(event: Event): void {
-        // What changed (checkbox checked/unchecked)? Where did it change?
         const { target } = event;
-        const { parentElement: item } = target as HTMLElement & {
+        const { parentElement: rowItem } = target as HTMLElement & {
             parentElement: TableRow;
         };
+
         // Condition the row's value into the selected array
-        if (item.selected) {
-            this.selectedSet.add(item.value);
-        } else {
-            this.selectedSet.delete(item.value);
+        switch (this.selects) {
+            case 'single': {
+                // If something is chosen but there's already a selection...
+                if (rowItem.selected && this.selectedSet.size >= 1) {
+                    // Clear out the array
+                    this.deselectCells();
+                    this.selectedSet.add(rowItem.value);
+                    break;
+                } else {
+                    this.selectedSet.add(rowItem.value);
+                    break;
+                }
+            }
+            case 'multiple': {
+                if (rowItem.selected) {
+                    this.selectedSet.add(rowItem.value);
+                } else {
+                    this.selectedSet.delete(rowItem.value);
+                }
+                this.selected = [...this.selectedSet];
+                break;
+            }
+            default: {
+                break;
+            }
         }
-        this.selected = [...this.selectedSet];
     }
 
     protected render(): TemplateResult {

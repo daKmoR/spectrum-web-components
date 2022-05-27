@@ -40,19 +40,37 @@ export class TableCheckboxCell extends SpectrumElement {
     @property({ type: Number, reflect: true })
     public tabIndex = -1;
 
-    // query for the checkbox itself so we can access its properties... Or am I just
-    // redoing work that exists on the checkbox itself? Whatever.
     @query('.checkbox')
     protected checkbox!: Checkbox;
 
     @property({ type: Boolean })
     public selected = false;
 
-    // do I need a change event here, or does the sp-checkbox take care of that for me?
+    // if it's in the table head, it has different behaviour
+    @property({ type: Boolean, attribute: 'in-table-head' })
+    public inTableHead = false;
 
     // If the checkbox cell is in the TableHead, it's going to have different behaviour...
     // How can we make that distinction ?
 
+    protected renderHeadCheckbox(): TemplateResult {
+        return html`
+            <sp-checkbox
+                ?checked=${this.selected}
+                in-table-head="true"
+                @change=${() => {
+                    this.dispatchEvent(
+                        new Event('change', {
+                            bubbles: true,
+                            cancelable: true,
+                            composed: true,
+                        })
+                    );
+                }}
+                class="checkbox"
+            ></sp-checkbox>
+        `;
+    }
     protected render(): TemplateResult {
         return html`
             <sp-checkbox

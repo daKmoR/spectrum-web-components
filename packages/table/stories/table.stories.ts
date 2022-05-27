@@ -316,7 +316,7 @@ export const virtualizedTwo = (): TemplateResult => {
 
 export const selectsSingle = (): TemplateResult => {
     return html`
-        <sp-table size="m" selects="single" .selected=${['row1']}>
+        <sp-table size="m" selects="single" .selected=${['row1', 'row5']}>
             <sp-table-head>
                 <sp-table-head-cell sortable sorted="desc">
                     Column Title
@@ -352,17 +352,13 @@ export const selectsSingle = (): TemplateResult => {
                 </sp-table-row>
             </sp-table-body>
         </sp-table>
+        <div>Selected:</div>
     `;
 };
 
 export const selectsMultiple = (): TemplateResult => {
     return html`
-        <sp-table
-            size="m"
-            selects="multiple"
-            .selected=${['row1', 'row2']}
-            @change=${() => console.log('table changed!')}
-        >
+        <sp-table size="m" selects="multiple" .selected=${['row1', 'row2']}>
             <sp-table-head>
                 <sp-table-head-cell sortable sorted="desc">
                     Column Title

@@ -48,7 +48,6 @@ export class TableRow extends SpectrumElement {
         ) as TableCheckboxCell;
         if (!checkboxCell) return;
 
-        // doesn't get it... works in devtools
         const checkbox = checkboxCell.shadowRoot.children[0] as Checkbox;
         if (!checkbox) return;
 
