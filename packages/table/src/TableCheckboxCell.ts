@@ -21,6 +21,7 @@ import {
     property,
     query,
 } from '@spectrum-web-components/base/src/decorators.js';
+import { ifDefined } from '@spectrum-web-components/base/src/directives.js';
 import cellStyles from './table-cell.css.js';
 import headCellStyles from './table-head-cell.css.js';
 import styles from './table-checkbox-cell.css.js';
@@ -41,40 +42,23 @@ export class TableCheckboxCell extends SpectrumElement {
     public tabIndex = -1;
 
     @query('.checkbox')
-    protected checkbox!: Checkbox;
+    public checkbox!: Checkbox;
 
     @property({ type: Boolean })
-    public selected = false;
+    public indeterminate = false;
 
-    // if it's in the table head, it has different behaviour
-    @property({ type: Boolean, attribute: 'in-table-head' })
-    public inTableHead = false;
+    @property({ type: Boolean })
+    public checked = false;
 
-    // If the checkbox cell is in the TableHead, it's going to have different behaviour...
-    // How can we make that distinction ?
+    @property({ type: Boolean, reflect: true, attribute: 'selects-single' })
+    public selectsSingle = false;
 
-    protected renderHeadCheckbox(): TemplateResult {
-        return html`
-            <sp-checkbox
-                ?checked=${this.selected}
-                in-table-head="true"
-                @change=${() => {
-                    this.dispatchEvent(
-                        new Event('change', {
-                            bubbles: true,
-                            cancelable: true,
-                            composed: true,
-                        })
-                    );
-                }}
-                class="checkbox"
-            ></sp-checkbox>
-        `;
-    }
     protected render(): TemplateResult {
         return html`
             <sp-checkbox
-                ?checked=${this.selected}
+                ?checked=${this.checked}
+                ?indeterminate=${this.indeterminate}
+                aria-hidden=${ifDefined(this.selectsSingle)}
                 @change=${() => {
                     this.dispatchEvent(
                         new Event('change', {

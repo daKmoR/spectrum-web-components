@@ -9,7 +9,7 @@ the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTA
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 */
-import { expect, fixture } from '@open-wc/testing';
+import { elementUpdated, expect, fixture, html } from '@open-wc/testing';
 
 import '../sp-table.js';
 import '../sp-table-head.js';
@@ -18,9 +18,16 @@ import '../sp-table-body.js';
 import '../sp-table-row.js';
 import '../sp-table-cell.js';
 import { Table } from '../';
-import { elements, virtualized } from '../stories/table.stories.js';
+import {
+    elements,
+    selectsMultiple,
+    selectsSingle,
+    virtualized,
+} from '../stories/table.stories.js';
 import { TableHeadCell } from '../src/TableHeadCell.js';
 import { sendKeys } from '@web/test-runner-commands';
+import { TableRow } from '../src/TableRow.js';
+// import { Checkbox } from '@spectrum-web-components/checkbox/src/Checkbox';
 // import { TableBody } from '../src/TableBody.js';
 
 let globalErrorHandler: undefined | OnErrorEventHandler = undefined;
@@ -138,4 +145,93 @@ describe('Table', () => {
 
         expect(firstSortable === test.shadowRoot?.activeElement).to.be.true;
     });
+
+    // it('does not select without [selects]', async () => {
+    //     const test = await fixture<HTMLElement>(elements());
+    //     const el = test.shadowRoot?.querySelector('sp-table') as Table;
+
+    //     const firstRow = el.querySelector('sp-table-row:nth-of-type(1)') as TableRow;
+    //     const firstRowCheckbox = el.querySelector('sp-checkbox:nth-of-type(2)') as Checkbox;
+    //     firstRow.selected = true;
+
+    //     await elementUpdated(test);
+    //     expect(el.selected.length).to.equal(1);
+
+    //     firstRowCheckbox.click();
+    //     await elementUpdated(test);
+
+    //     expect(el.selected.length).to.equal(1);
+    // });
+
+    it('surfaces [selects="single"] selection', async () => {
+        const el = await fixture<Table>(selectsSingle());
+
+        expect(el.selected, "'Row 1 selected").to.deep.equal(['row1']);
+    });
+
+    it('surfaces [selects="multiple"] selection', async () => {
+        const el = await fixture<Table>(selectsMultiple());
+
+        expect(el.selected, 'Rows 1 and 2 selected').to.deep.equal([
+            'row1',
+            'row2',
+        ]);
+    });
+
+    xit('selects via `click` while [selects="single"]', async () => {
+        const el = await fixture<Table>(html`
+            <sp-table size="m" selects="single">
+                <sp-table-head>
+                    <sp-table-head-cell sortable sorted="desc">
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell sortable>
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                </sp-table-head>
+                <sp-table-body style="height: 120px">
+                    <sp-table-row value="row1">
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row2" selected>
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row3" class="row3">
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row4">
+                        <sp-table-cell>Row Item Delta</sp-table-cell>
+                        <sp-table-cell>Row Item Delta</sp-table-cell>
+                        <sp-table-cell>Row Item Delta</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row5">
+                        <sp-table-cell>Row Item Echo</sp-table-cell>
+                        <sp-table-cell>Row Item Echo</sp-table-cell>
+                        <sp-table-cell>Row Item Echo</sp-table-cell>
+                    </sp-table-row>
+                </sp-table-body>
+            </sp-table>
+        `);
+        const thirdRow = el.querySelector('.row3') as TableRow;
+
+        await elementUpdated(el);
+        expect(el.selected.length).to.equal(0);
+        // fails bc we haven't dealt with attribute-based selection yet
+
+        expect(el.selected.includes('row2'));
+
+        thirdRow.click();
+        await elementUpdated(el);
+
+        expect(thirdRow.selected).to.be.true;
+    });
+
+    xit('selects via `click` while  [selects="multiple"] selection');
 });

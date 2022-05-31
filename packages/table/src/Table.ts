@@ -19,6 +19,7 @@ import {
 import { property } from '@spectrum-web-components/base/src/decorators.js';
 
 import styles from './table.css.js';
+import { TableCheckboxCell } from './TableCheckboxCell.js';
 import { TableHead } from './TableHead.js';
 import type { TableHeadCell } from './TableHeadCell.js';
 import { TableRow } from './TableRow.js';
@@ -52,60 +53,74 @@ export class Table extends SpectrumElement {
         }
     }
 
-    private deselectCells(): void {
+    private selectRows(): void {
+        const tableRows = [
+            ...this.querySelectorAll('sp-table-row'),
+        ] as TableRow[];
+        tableRows.forEach((row) => {
+            row.selected = true; // Visually
+            this.selectedSet.add(row.value); // Prepares table state
+        });
+        this.selected = [...this.selectedSet];
+
+        const tableHeadCheckbox = this.querySelector(
+            'sp-table-head sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
+        tableHeadCheckbox.checked = true;
+        tableHeadCheckbox.indeterminate = false;
+    }
+
+    private deselectRows(): void {
         const selectedRows = [
             ...this.querySelectorAll('[selected]'),
         ] as TableRow[];
 
         selectedRows.forEach((row) => {
             row.selected = false;
-            row.tabIndex = -1;
-            row.setAttribute('aria-checked', 'false');
         });
 
         this.selectedSet.clear();
+        this.selected = [];
+
+        const tableHeadCheckbox = this.querySelector(
+            'sp-table-head sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
+        tableHeadCheckbox.checked = false;
+        tableHeadCheckbox.indeterminate = false;
         // TODO: handle selection/deselection for tableHead Checkbox, too
     }
 
     // We create/delete checkbox cells here.
-    protected handleSelects(): void {
+    protected manageSelects(): void {
         // add or delete checkboxes
-        if (this.selects === 'multiple') {
+        if (!!this.selects) {
             const tableHead = this.querySelector('sp-table-head') as TableHead;
             const tableRows = [
                 ...this.querySelectorAll('sp-table-row'),
             ] as TableRow[];
 
-            tableHead.insertAdjacentElement(
-                'afterbegin',
-                document.createElement('sp-table-checkbox-cell')
+            const tableHeadCheckbox = document.createElement(
+                'sp-table-checkbox-cell'
             );
-            tableRows.forEach((row) => {
-                row.insertAdjacentElement(
-                    'afterbegin',
-                    document.createElement('sp-table-checkbox-cell')
-                );
-                row.selected = this.selectedSet.has(row.value);
-            });
-        } else if (this.selects === 'single') {
-            const tableHead = this.querySelector('sp-table-head') as TableHead;
-            const tableRows = [
-                ...this.querySelectorAll('sp-table-row'),
-            ] as TableRow[];
+            const rows = this.querySelectorAll(
+                'sp-table-row'
+            ) as NodeListOf<TableRow>;
+            const allSelected = this.selected.length === rows.length;
+            tableHeadCheckbox.selectsSingle = this.selects === 'single';
+            tableHeadCheckbox.checked = allSelected;
+            tableHeadCheckbox.indeterminate =
+                this.selected.length > 0 && !allSelected;
+            tableHead.insertAdjacentElement('afterbegin', tableHeadCheckbox);
 
-            tableHead.insertAdjacentElement(
-                'afterbegin',
-                document.createElement('sp-table-checkbox-cell')
-            );
             tableRows.forEach((row) => {
-                row.insertAdjacentElement(
-                    'afterbegin',
-                    document.createElement('sp-table-checkbox-cell')
+                const checkbox = document.createElement(
+                    'sp-table-checkbox-cell'
                 );
-                // make sure we're not duplicating values!
+                row.insertAdjacentElement('afterbegin', checkbox);
+
                 row.selected = this.selectedSet.has(row.value);
+                checkbox.checked = row.selected;
             });
-            // if selects = 'single', but multiple entries are selected, what do?
         } else {
             const checkboxes = this.querySelectorAll('sp-table-checkbox-cell');
             checkboxes.forEach((box) => {
@@ -115,24 +130,35 @@ export class Table extends SpectrumElement {
     }
 
     protected handleChange(event: Event): void {
+        // if rowItem doesn't have a value, we assume it's in TableHead (naive!!!)
         const { target } = event;
         const { parentElement: rowItem } = target as HTMLElement & {
             parentElement: TableRow;
         };
-
+        if (!rowItem.value) {
+            // no value means it's TableHead's checkbox
+            const { checkbox } = target as TableCheckboxCell;
+            if (checkbox.checked || checkbox.indeterminate) {
+                this.selectRows();
+            } else {
+                this.deselectRows();
+            }
+            return;
+        }
         // Condition the row's value into the selected array
         switch (this.selects) {
             case 'single': {
-                // If something is chosen but there's already a selection...
-                if (rowItem.selected && this.selectedSet.size >= 1) {
-                    // Clear out the array
-                    this.deselectCells();
+                this.deselectRows();
+                if (rowItem.selected) {
                     this.selectedSet.add(rowItem.value);
-                    break;
-                } else {
-                    this.selectedSet.add(rowItem.value);
-                    break;
+                    this.selected = [...this.selectedSet];
                 }
+                // if you have multiple selected, but selects='single',
+                // we deselect all cells? hmm...
+                // EXAMPLE: rows 1, 2, 4 are selected but selects is single.
+                // we deselect 2 => 1 and 4 are STILL SELECTED. if you want
+                // to select any item, it's going to deselect all the cells before
+                // reselecting the cell you just clicked on, as seen above.
             }
             case 'multiple': {
                 if (rowItem.selected) {
@@ -141,6 +167,17 @@ export class Table extends SpectrumElement {
                     this.selectedSet.delete(rowItem.value);
                 }
                 this.selected = [...this.selectedSet];
+
+                const tableHeadCheckbox = this.querySelector(
+                    'sp-table-head sp-table-checkbox-cell'
+                ) as TableCheckboxCell;
+                const checkboxes = this.querySelectorAll(
+                    'sp-table-body sp-table-checkbox-cell'
+                ) as NodeListOf<TableCheckboxCell>;
+                const allSelected = this.selected.length === checkboxes.length;
+                tableHeadCheckbox.checked = allSelected;
+                tableHeadCheckbox.indeterminate =
+                    this.selected.length > 0 && !allSelected;
                 break;
             }
             default: {
@@ -160,7 +197,7 @@ export class Table extends SpectrumElement {
             this.selectedSet = new Set(this.selected);
         }
         if (changed.has('selects')) {
-            this.handleSelects();
+            this.manageSelects();
         }
     }
 }

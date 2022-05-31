@@ -29,22 +29,11 @@ import { Table } from '@spectrum-web-components/table';
 
 ## Questions
 
--   Is `selectable` necessary?
-    -   TO DO:
-        -   Table reacts to `selects` attr and injects sp-table-checkbox-cell into the table's head and each row, because that's how this works. yeah. ~_WILL UPDATE LIFECYCLE METHOD!!!!!_~
-            -   manage single selection
-        -   CHeckbox in TableHead should react to `selected` in the rows being selected. If one selects the TableHead checkbox, the TableRow checkboxes shoudl also react.
-        -   Indeterminate state in tableHead checkbox cell if multiple but not all checkboxes in TableRow are selected
-        -   Remove TableHead checkbox in the case of single selection
-        -   If the table was to move from selects to undefined, clean up those checkboxes
--   What should `value` be in `<sp-table-row>`? The index of the row?
-
 -   Next steparoonies:
 
 1. make selection work with virtualised elements. rip.
-2. Wire a selection monitor into the story a la Action Group
-3. Scrolling w/ screenreader on virtualised table elements
-4. Tests for each
+2. Scrolling w/ screenreader on virtualised table elements
+3. Tests for each
 
 -   NOT CURRENTLY NEEDED but still important
 

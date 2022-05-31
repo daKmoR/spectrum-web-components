@@ -60,7 +60,7 @@ export class TableRow extends SpectrumElement {
         ) as TableCheckboxCell;
         if (!checkboxCell) return;
 
-        checkboxCell.selected = this.selected;
+        checkboxCell.checked = this.selected;
     }
 
     protected render(): TemplateResult {

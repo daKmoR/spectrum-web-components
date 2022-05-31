@@ -16,3 +16,7 @@ governing permissions and limitations under the License.
     display: block;
     flex: 0 1 0%;
 }
+
+:host([selects-single]) sp-checkbox {
+    visibility: hidden;
+}

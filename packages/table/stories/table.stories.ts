@@ -24,6 +24,7 @@ import '../sp-table-body.js';
 import '../sp-table-row.js';
 import '../sp-table-cell.js';
 import type { SortedEventDetails } from '../src/TableHeadCell.js';
+import { Table } from '../src/Table.js';
 
 export default {
     title: 'Table',
@@ -316,7 +317,17 @@ export const virtualizedTwo = (): TemplateResult => {
 
 export const selectsSingle = (): TemplateResult => {
     return html`
-        <sp-table size="m" selects="single" .selected=${['row1', 'row5']}>
+        <sp-table
+            size="m"
+            selects="single"
+            .selected=${['row1']}
+            @change=${({ currentTarget }: Event & { currentTarget: Table }) => {
+                const next = currentTarget.nextElementSibling as HTMLDivElement;
+                next.textContent = `Selected: ${JSON.stringify(
+                    currentTarget.selected
+                )}`;
+            }}
+        >
             <sp-table-head>
                 <sp-table-head-cell sortable sorted="desc">
                     Column Title
@@ -355,10 +366,9 @@ export const selectsSingle = (): TemplateResult => {
         <div>Selected:</div>
     `;
 };
-
-export const selectsMultiple = (): TemplateResult => {
+export const selectsSingleWeird = (): TemplateResult => {
     return html`
-        <sp-table size="m" selects="multiple" .selected=${['row1', 'row2']}>
+        <sp-table size="m" selects="single" .selected=${['row1', 'row2']}>
             <sp-table-head>
                 <sp-table-head-cell sortable sorted="desc">
                     Column Title
@@ -394,6 +404,58 @@ export const selectsMultiple = (): TemplateResult => {
                 </sp-table-row>
             </sp-table-body>
         </sp-table>
+    `;
+};
+
+export const selectsMultiple = (): TemplateResult => {
+    return html`
+        <sp-table
+            size="m"
+            selects="multiple"
+            .selected=${['row1', 'row2']}
+            @change=${({ currentTarget }: Event & { currentTarget: Table }) => {
+                const next = currentTarget.nextElementSibling as HTMLDivElement;
+                next.textContent = `Selected: ${JSON.stringify(
+                    currentTarget.selected
+                )}`;
+            }}
+        >
+            <sp-table-head>
+                <sp-table-head-cell sortable sorted="desc">
+                    Column Title
+                </sp-table-head-cell>
+                <sp-table-head-cell sortable>Column Title</sp-table-head-cell>
+                <sp-table-head-cell>Column Title</sp-table-head-cell>
+            </sp-table-head>
+            <sp-table-body style="height: 120px">
+                <sp-table-row value="row1">
+                    <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    <sp-table-cell>Row Item Alpha</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row2">
+                    <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    <sp-table-cell>Row Item Bravo</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row3">
+                    <sp-table-cell>Row Item Charlie</sp-table-cell>
+                    <sp-table-cell>Row Item Charlie</sp-table-cell>
+                    <sp-table-cell>Row Item Charlie</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row4">
+                    <sp-table-cell>Row Item Delta</sp-table-cell>
+                    <sp-table-cell>Row Item Delta</sp-table-cell>
+                    <sp-table-cell>Row Item Delta</sp-table-cell>
+                </sp-table-row>
+                <sp-table-row value="row5">
+                    <sp-table-cell>Row Item Echo</sp-table-cell>
+                    <sp-table-cell>Row Item Echo</sp-table-cell>
+                    <sp-table-cell>Row Item Echo</sp-table-cell>
+                </sp-table-row>
+            </sp-table-body>
+        </sp-table>
+        <div>Selected:</div>
     `;
 };
 
