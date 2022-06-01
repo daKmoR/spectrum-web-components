@@ -34,6 +34,7 @@ import { Table } from '@spectrum-web-components/table';
 1. make selection work with virtualised elements. rip.
 2. Scrolling w/ screenreader on virtualised table elements
 3. Tests for each
+4. Do story without current target
 
 -   NOT CURRENTLY NEEDED but still important
 

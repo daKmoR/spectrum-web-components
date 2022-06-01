@@ -407,6 +407,13 @@ export const selectsSingleWeird = (): TemplateResult => {
     `;
 };
 
+// @change=${({ currentTarget }: Event & { currentTarget: Table }) => {
+//     const next = currentTarget.nextElementSibling as HTMLDivElement;
+//     next.textContent = `Selected: ${JSON.stringify(
+//         currentTarget.selected
+//     )}`;
+// }}
+
 export const selectsMultiple = (): TemplateResult => {
     return html`
         <sp-table

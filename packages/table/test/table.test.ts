@@ -27,6 +27,8 @@ import {
 import { TableHeadCell } from '../src/TableHeadCell.js';
 import { sendKeys } from '@web/test-runner-commands';
 import { TableRow } from '../src/TableRow.js';
+import { spy } from 'sinon';
+import { TableCheckboxCell } from '../src/TableCheckboxCell.js';
 // import { Checkbox } from '@spectrum-web-components/checkbox/src/Checkbox';
 // import { TableBody } from '../src/TableBody.js';
 
@@ -146,22 +148,68 @@ describe('Table', () => {
         expect(firstSortable === test.shadowRoot?.activeElement).to.be.true;
     });
 
-    // it('does not select without [selects]', async () => {
-    //     const test = await fixture<HTMLElement>(elements());
-    //     const el = test.shadowRoot?.querySelector('sp-table') as Table;
+    it('dispatches `change` events', async () => {
+        const changeSpy = spy();
+        const el = await fixture<Table>(html`
+            <sp-table
+                size="m"
+                selects="multiple"
+                .selected=${['row1', 'row2']}
+                @change=${({ target }: Event & { target: Table }) => {
+                    changeSpy(target);
+                }}
+            >
+                <sp-table-head>
+                    <sp-table-head-cell sortable sorted="desc">
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell sortable>
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                </sp-table-head>
+                <sp-table-body style="height: 120px">
+                    <sp-table-row value="row1">
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row2">
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row3">
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row4">
+                        <sp-table-cell>Row Item Delta</sp-table-cell>
+                        <sp-table-cell>Row Item Delta</sp-table-cell>
+                        <sp-table-cell>Row Item Delta</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row5">
+                        <sp-table-cell>Row Item Echo</sp-table-cell>
+                        <sp-table-cell>Row Item Echo</sp-table-cell>
+                        <sp-table-cell>Row Item Echo</sp-table-cell>
+                    </sp-table-row>
+                </sp-table-body>
+            </sp-table>
+            <div>Selected:</div>
+        `);
+        const rowThreeCheckboxCell = el.querySelector(
+            '[value="row3"] sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
 
-    //     const firstRow = el.querySelector('sp-table-row:nth-of-type(1)') as TableRow;
-    //     const firstRowCheckbox = el.querySelector('sp-checkbox:nth-of-type(2)') as Checkbox;
-    //     firstRow.selected = true;
+        expect(el.selected).to.deep.equal(['row1', 'row2']);
 
-    //     await elementUpdated(test);
-    //     expect(el.selected.length).to.equal(1);
+        rowThreeCheckboxCell.checkbox.click();
 
-    //     firstRowCheckbox.click();
-    //     await elementUpdated(test);
-
-    //     expect(el.selected.length).to.equal(1);
-    // });
+        expect(el.selected).to.deep.equal(['row1', 'row2', 'row3']);
+        expect(changeSpy.calledOnce).to.be.true;
+        expect(changeSpy.calledWithExactly(el)).to.be.true;
+    });
 
     it('surfaces [selects="single"] selection', async () => {
         const el = await fixture<Table>(selectsSingle());

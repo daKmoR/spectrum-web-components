@@ -87,7 +87,6 @@ export class Table extends SpectrumElement {
         ) as TableCheckboxCell;
         tableHeadCheckbox.checked = false;
         tableHeadCheckbox.indeterminate = false;
-        // TODO: handle selection/deselection for tableHead Checkbox, too
     }
 
     // We create/delete checkbox cells here.
@@ -190,6 +189,40 @@ export class Table extends SpectrumElement {
         return html`
             <slot @change=${this.handleChange}></slot>
         `;
+    }
+
+    // protected handleCheckbox(event: Event & { target: TableCheckboxCell }): void {
+    //     const { checked } = event.target;
+    //     const { parentElement: rowItem } = target as HTMLElement & {
+    //         parentElement: TableRow;
+    //     };
+    //     if (checked) {
+    //         event.target.value = rowItem.value;
+    //     }
+    // }
+
+    protected firstUpdated(changes: PropertyValues<this>): void {
+        super.firstUpdated(changes);
+
+        this.shadowRoot.addEventListener('change', (event: Event) => {
+            event.stopPropagation();
+            const target = event.target as TableCheckboxCell;
+            const { parentElement: rowItem } = target as TableCheckboxCell & {
+                parentElement: TableRow;
+            };
+
+            if (rowItem.selected) {
+                this.selectedSet.add(rowItem.value);
+                this.dispatchEvent(
+                    new Event('change', {
+                        cancelable: true,
+                        bubbles: true,
+                        composed: true,
+                    })
+                );
+            }
+            this.selected = [...this.selectedSet];
+        });
     }
 
     protected willUpdate(changed: PropertyValues<this>): void {
