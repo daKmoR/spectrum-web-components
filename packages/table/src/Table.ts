@@ -191,16 +191,6 @@ export class Table extends SpectrumElement {
         `;
     }
 
-    // protected handleCheckbox(event: Event & { target: TableCheckboxCell }): void {
-    //     const { checked } = event.target;
-    //     const { parentElement: rowItem } = target as HTMLElement & {
-    //         parentElement: TableRow;
-    //     };
-    //     if (checked) {
-    //         event.target.value = rowItem.value;
-    //     }
-    // }
-
     protected firstUpdated(changes: PropertyValues<this>): void {
         super.firstUpdated(changes);
 
