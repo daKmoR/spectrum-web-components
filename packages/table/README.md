@@ -31,10 +31,9 @@ import { Table } from '@spectrum-web-components/table';
 
 -   Next steparoonies:
 
-1. make selection work with virtualised elements. rip.
+1. Test for: change event on tablehead checkbox cell;
 2. Scrolling w/ screenreader on virtualised table elements
-3. Tests for each
-4. Do story without current target
+3. make selection work with virtualised elements. rip.
 
 -   NOT CURRENTLY NEEDED but still important
 

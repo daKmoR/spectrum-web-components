@@ -17,6 +17,8 @@ import {
 } from '@spectrum-web-components/base';
 import { property } from '@spectrum-web-components/base/src/decorators.js';
 import type { TableHeadCell } from './TableHeadCell.js';
+import { TableCheckboxCell } from './TableCheckboxCell.js';
+import { Checkbox } from '@spectrum-web-components/checkbox';
 
 import styles from './table-head.css.js';
 
@@ -33,7 +35,8 @@ export class TableHead extends SpectrumElement {
 
     public childCells = [] as TableHeadCell[];
 
-    public selectable?: boolean;
+    @property({ type: Boolean, reflect: true })
+    public selected?: boolean;
 
     private handleSorted({ target }: Event): void {
         const childCells = [...this.children] as TableHeadCell[];
@@ -44,16 +47,26 @@ export class TableHead extends SpectrumElement {
         });
     }
 
-    // private handleSelectAll({ target }: Event): void {
-    //     const childCells = [this.child]
-    // }
+    protected handleChange(): void {
+        // get the value of "checked" from the sp-checkbox
+        const checkboxCell = this.querySelector(
+            'sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
+        if (!checkboxCell) return;
+
+        const checkbox = checkboxCell.shadowRoot.children[0] as Checkbox;
+        if (!checkbox) return;
+
+        // selects-single should not do anything here... right?
+        this.selected = checkbox.checked || checkbox.indeterminate;
+    }
 
     protected render(): TemplateResult {
         return html`
-            <slot @sorted=${this.handleSorted}></slot>
+            <slot
+                @sorted=${this.handleSorted}
+                @change=${this.handleChange}
+            ></slot>
         `;
     }
-
-    // I want this to listen for the change on a checkbox Cell and to update
-    // its selected state accordingly.
 }

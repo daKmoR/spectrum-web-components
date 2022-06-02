@@ -202,12 +202,28 @@ describe('Table', () => {
             '[value="row3"] sp-table-checkbox-cell'
         ) as TableCheckboxCell;
 
+        const tableHeadCheckboxCell = el.querySelector(
+            'sp-table-head sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
+
         expect(el.selected).to.deep.equal(['row1', 'row2']);
 
         rowThreeCheckboxCell.checkbox.click();
 
         expect(el.selected).to.deep.equal(['row1', 'row2', 'row3']);
         expect(changeSpy.calledOnce).to.be.true;
+        expect(changeSpy.calledWithExactly(el)).to.be.true;
+
+        tableHeadCheckboxCell.checkbox.click();
+
+        expect(el.selected).to.deep.equal([
+            'row1',
+            'row2',
+            'row3',
+            'row4',
+            'row5',
+        ]);
+        expect(changeSpy.callCount).to.equal(2);
         expect(changeSpy.calledWithExactly(el)).to.be.true;
     });
 
@@ -224,6 +240,109 @@ describe('Table', () => {
             'row1',
             'row2',
         ]);
+    });
+
+    it('selects a user-passed value for .selected array with no [selects="single"] specified, but does not allow interaction afterwards', async () => {
+        const el = await fixture<Table>(html`
+            <sp-table size="m" .selected=${['row3']}>
+                <sp-table-head>
+                    <sp-table-head-cell sortable sorted="desc">
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                </sp-table-head>
+                <sp-table-body style="height: 120px">
+                    <sp-table-row value="row1" class="row1">
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row2" class="row2">
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row3" class="row3">
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                    </sp-table-row>
+                </sp-table-body>
+            </sp-table>
+        `);
+        await elementUpdated(el);
+
+        expect(el.selected.length).to.equal(1);
+
+        const rowThree = el.querySelector('.row3') as TableRow;
+        const rowTwo = el.querySelector('.row2') as TableRow;
+        const rowTwoCheckbox = rowTwo.querySelector(
+            'sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
+
+        expect(rowThree.selected, 'third row selected').to.be.true;
+        expect(rowTwo.selected, 'second row selected').to.be.false;
+
+        rowTwoCheckbox.click();
+        await elementUpdated(el);
+
+        expect(el.selected.length).to.equal(1);
+        expect(rowThree.selected, 'third row selected').to.be.true;
+        expect(rowTwo.selected, 'second row selected').to.be.false;
+    });
+
+    it('selects user-passed values for .selected array with no [selects="multiple"] specified, but does not allow interaction afterwards', async () => {
+        const el = await fixture<Table>(html`
+            <sp-table size="m" .selected=${['row2', 'row3']}>
+                <sp-table-head>
+                    <sp-table-head-cell sortable sorted="desc">
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                </sp-table-head>
+                <sp-table-body style="height: 120px">
+                    <sp-table-row value="row1" class="row1">
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row2" class="row2">
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row3" class="row3">
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                    </sp-table-row>
+                </sp-table-body>
+            </sp-table>
+        `);
+        await elementUpdated(el);
+
+        expect(el.selected.length).to.equal(2);
+
+        const rowThree = el.querySelector('.row3') as TableRow;
+        const rowTwo = el.querySelector('.row2') as TableRow;
+        const rowOne = el.querySelector('.row1') as TableRow;
+        const rowOneCheckbox = rowOne.querySelector(
+            'sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
+
+        expect(rowThree.selected, 'third row selected').to.be.true;
+        expect(rowTwo.selected, 'second row selected').to.be.true;
+        expect(rowOne.selected, 'first row selected').to.be.false;
+
+        rowOneCheckbox.click();
+        await elementUpdated(el);
+
+        expect(el.selected.length).to.equal(2);
+        expect(rowThree.selected, 'third row selected').to.be.true;
+        expect(rowTwo.selected, 'second row selected').to.be.true;
+        expect(rowOne.selected, 'first row selected').to.be.false;
     });
 
     xit('selects via `click` while [selects="single"]', async () => {

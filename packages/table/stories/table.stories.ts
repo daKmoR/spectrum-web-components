@@ -186,19 +186,6 @@ export const virtualized = (): TemplateResult => {
     `;
 };
 
-/*
-${repeat({
-    items: items,
-    renderItem: id => html`
-        <sp-table-row>
-            <sp-table-cell>Row Item Alpha ${id}</sp-table-cell>
-            <sp-table-cell>Row Item Alpha</sp-table-cell>
-            <sp-table-cell>Row Item Alpha</sp-table-cell>
-        </sp-table-row>
-    `
-})}
-*/
-
 interface Item extends Record<string, unknown> {
     name: string;
     date: number;
@@ -274,57 +261,16 @@ export const virtualizedTwo = (): TemplateResult => {
     `;
 };
 
-// export const notes = (): TemplateResult => {
-//     return html`
-//         <sp-table size="m" selects="single | multiple" selected=${values = String[]}>
-//             <sp-table-head>
-//                 <sp-table-head-cell sortable sorted="desc">
-//                     Column Title
-//                 </sp-table-head-cell>
-//                 <sp-table-head-cell sortable>Column Title</sp-table-head-cell>
-//                 <sp-table-head-cell>Column Title</sp-table-head-cell>
-//             </sp-table-head>
-//             <sp-table-body style="height: 120px">
-//                 <sp-table-row value="" selectable selected>
-//                     <sp-table-cell>Row Item Alpha</sp-table-cell>
-//                     <sp-table-cell>Row Item Alpha</sp-table-cell>
-//                     <sp-table-cell>Row Item Alpha</sp-table-cell>
-//                 </sp-table-row>
-//                 <sp-table-row value="" selectable>
-//                     <sp-table-cell>Row Item Bravo</sp-table-cell>
-//                     <sp-table-cell>Row Item Bravo</sp-table-cell>
-//                     <sp-table-cell>Row Item Bravo</sp-table-cell>
-//                 </sp-table-row>
-//                 <sp-table-row value="" selectable>
-//                     <sp-table-cell>Row Item Charlie</sp-table-cell>
-//                     <sp-table-cell>Row Item Charlie</sp-table-cell>
-//                     <sp-table-cell>Row Item Charlie</sp-table-cell>
-//                 </sp-table-row>
-//                 <sp-table-row value="" selectable>
-//                     <sp-table-cell>Row Item Delta</sp-table-cell>
-//                     <sp-table-cell>Row Item Delta</sp-table-cell>
-//                     <sp-table-cell>Row Item Delta</sp-table-cell>
-//                 </sp-table-row>
-//                 <sp-table-row value="" selectable>
-//                     <sp-table-cell>Row Item Echo</sp-table-cell>
-//                     <sp-table-cell>Row Item Echo</sp-table-cell>
-//                     <sp-table-cell>Row Item Echo</sp-table-cell>
-//                 </sp-table-row>
-//             </sp-table-body>
-//         </sp-table>
-//     `;
-// };
-
 export const selectsSingle = (): TemplateResult => {
     return html`
         <sp-table
             size="m"
             selects="single"
             .selected=${['row1']}
-            @change=${({ currentTarget }: Event & { currentTarget: Table }) => {
-                const next = currentTarget.nextElementSibling as HTMLDivElement;
+            @change=${({ target }: Event & { target: Table }) => {
+                const next = target.nextElementSibling as HTMLDivElement;
                 next.textContent = `Selected: ${JSON.stringify(
-                    currentTarget.selected
+                    target.selected
                 )}`;
             }}
         >
@@ -363,12 +309,12 @@ export const selectsSingle = (): TemplateResult => {
                 </sp-table-row>
             </sp-table-body>
         </sp-table>
-        <div>Selected:</div>
+        <div>Selected: ["row1"]</div>
     `;
 };
 export const selectsSingleWeird = (): TemplateResult => {
     return html`
-        <sp-table size="m" selects="single" .selected=${['row1', 'row2']}>
+        <sp-table size="m" .selected=${['row1', 'row2']}>
             <sp-table-head>
                 <sp-table-head-cell sortable sorted="desc">
                     Column Title
@@ -406,13 +352,6 @@ export const selectsSingleWeird = (): TemplateResult => {
         </sp-table>
     `;
 };
-
-// @change=${({ currentTarget }: Event & { currentTarget: Table }) => {
-//     const next = currentTarget.nextElementSibling as HTMLDivElement;
-//     next.textContent = `Selected: ${JSON.stringify(
-//         currentTarget.selected
-//     )}`;
-// }}
 
 export const selectsMultiple = (): TemplateResult => {
     return html`
@@ -420,10 +359,10 @@ export const selectsMultiple = (): TemplateResult => {
             size="m"
             selects="multiple"
             .selected=${['row1', 'row2']}
-            @change=${({ currentTarget }: Event & { currentTarget: Table }) => {
-                const next = currentTarget.nextElementSibling as HTMLDivElement;
+            @change=${({ target }: Event & { target: Table }) => {
+                const next = target.nextElementSibling as HTMLDivElement;
                 next.textContent = `Selected: ${JSON.stringify(
-                    currentTarget.selected
+                    target.selected
                 )}`;
             }}
         >
@@ -462,35 +401,9 @@ export const selectsMultiple = (): TemplateResult => {
                 </sp-table-row>
             </sp-table-body>
         </sp-table>
-        <div>Selected:</div>
+        <div>Selected: ["row1", "row2"]</div>
     `;
 };
-
-/*
-        <sp-table size="m" selects="multiple" .selected=${["row1", "row2"]}>
-            <sp-table-head>
-                <sp-table-head-cell sortable sorted="desc">
-                    Column Title
-                </sp-table-head-cell>
-                <sp-table-head-cell sortable>Column Title</sp-table-head-cell>
-                <sp-table-head-cell>Column Title</sp-table-head-cell>
-            </sp-table-head>
-            <sp-table-body style="height: 120px">
-                <sp-table-row value="row1">
-                    <sp-table-checkbox-cell></sp-table-checkbox-cell>
-                    <sp-table-cell>Row Item Alpha</sp-table-cell>
-                    <sp-table-cell>Row Item Alpha</sp-table-cell>
-                    <sp-table-cell>Row Item Alpha</sp-table-cell>
-                </sp-table-row>
-                <sp-table-row value="row2">
-                    <sp-table-checkbox-cell></sp-table-checkbox-cell>
-                    <sp-table-cell>Row Item Bravo</sp-table-cell>
-                    <sp-table-cell>Row Item Bravo</sp-table-cell>
-                    <sp-table-cell>Row Item Bravo</sp-table-cell>
-                </sp-table-row>
-            </sp-table-body>
-        </sp-table>
-        */
 
 export const selectsMultipleAttributes = (): TemplateResult => {
     return html`
