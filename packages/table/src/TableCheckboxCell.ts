@@ -31,7 +31,7 @@ import { Checkbox } from '@spectrum-web-components/checkbox';
  * @element sp-table
  */
 export class TableCheckboxCell extends SpectrumElement {
-    public static get styles(): CSSResultArray {
+    public static override get styles(): CSSResultArray {
         return [cellStyles, headCellStyles, styles];
     }
 
@@ -39,7 +39,7 @@ export class TableCheckboxCell extends SpectrumElement {
     public role = 'gridcell';
 
     @property({ type: Number, reflect: true })
-    public tabIndex = -1;
+    public override tabIndex = -1;
 
     @query('.checkbox')
     public checkbox!: Checkbox;
@@ -56,7 +56,7 @@ export class TableCheckboxCell extends SpectrumElement {
     @property({ type: Boolean, reflect: true, attribute: 'selects-single' })
     public selectsSingle = false;
 
-    protected render(): TemplateResult {
+    protected override render(): TemplateResult {
         return html`
             <sp-checkbox
                 ?checked=${this.checked}

@@ -39,7 +39,7 @@ const ariaSortValue = (sorted?: 'asc' | 'desc'): string => {
  * @element sp-table
  */
 export class TableHeadCell extends SpectrumElement {
-    public static get styles(): CSSResultArray {
+    public static override get styles(): CSSResultArray {
         return [styles, arrowStyles];
     }
 
@@ -56,9 +56,9 @@ export class TableHeadCell extends SpectrumElement {
     public sortBy = '';
 
     @property({ type: Number, reflect: true })
-    public tabIndex = -1;
+    public override tabIndex = -1;
 
-    protected render(): TemplateResult {
+    protected override render(): TemplateResult {
         const visiblySorted = this.sortable && !!this.sorted;
         return html`
             <slot></slot>
@@ -72,7 +72,7 @@ export class TableHeadCell extends SpectrumElement {
         `;
     }
 
-    protected firstUpdated(changes: PropertyValues): void {
+    protected override firstUpdated(changes: PropertyValues): void {
         super.firstUpdated(changes);
         this.addEventListener('click', () => {
             if (!this.sortable) return;
@@ -93,7 +93,7 @@ export class TableHeadCell extends SpectrumElement {
         });
     }
 
-    protected update(changes: PropertyValues): void {
+    protected override update(changes: PropertyValues): void {
         if (changes.has('sorted')) {
             this.setAttribute('aria-sort', ariaSortValue(this.sorted));
         }

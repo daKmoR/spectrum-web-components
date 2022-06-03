@@ -28,7 +28,7 @@ import { TableRow } from './TableRow.js';
  */
 
 export class Table extends SpectrumElement {
-    public static get styles(): CSSResultArray {
+    public static override get styles(): CSSResultArray {
         return [styles];
     }
 
@@ -43,7 +43,7 @@ export class Table extends SpectrumElement {
 
     private selectedSet = new Set<string>();
 
-    public focus(): void {
+    public override focus(): void {
         const sortableHeadCell = this.querySelector(
             'sp-table-head-cell[sortable]'
         ) as TableHeadCell;
@@ -277,19 +277,19 @@ export class Table extends SpectrumElement {
         );
     }
 
-    protected render(): TemplateResult {
+    protected override render(): TemplateResult {
         return html`
             <slot @change=${this.handleChange}></slot>
         `;
     }
 
-    public connectedCallback(): void {
+    public override connectedCallback(): void {
         super.connectedCallback();
         this.selectedSet = new Set(this.selected);
 
         this.manageCheckboxes();
     }
-    protected willUpdate(changed: PropertyValues<this>): void {
+    protected override willUpdate(changed: PropertyValues<this>): void {
         // if (!this.hasUpdated) {
         //     this.selectedSet = new Set(this.selected);
         // }

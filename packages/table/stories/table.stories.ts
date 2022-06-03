@@ -137,7 +137,7 @@ class VirtualTable extends SpectrumElement {
         `;
     };
 
-    protected render(): TemplateResult {
+    protected override render(): TemplateResult {
         return html`
             <sp-table
                 aria-rowcount="50"

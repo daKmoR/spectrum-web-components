@@ -28,7 +28,7 @@ import { TableCheckboxCell } from './TableCheckboxCell.js';
  * @element sp-table
  */
 export class TableRow extends SpectrumElement {
-    public static get styles(): CSSResultArray {
+    public static override get styles(): CSSResultArray {
         return [styles];
     }
 
@@ -63,7 +63,7 @@ export class TableRow extends SpectrumElement {
         checkboxCell.checked = this.selected;
     }
 
-    protected render(): TemplateResult {
+    protected override render(): TemplateResult {
         return html`
             <slot></slot>
         `;
@@ -71,13 +71,13 @@ export class TableRow extends SpectrumElement {
 
     // I want this to listen for the change on a checkbox Cell and to update
     // its selected state accordingly.
-    protected firstUpdated(changes: PropertyValues): void {
+    protected override firstUpdated(changes: PropertyValues): void {
         super.firstUpdated(changes);
         // cache a ref to checkbox cell here bc DOM is current
         this.addEventListener('change', this.handleChange);
     }
 
-    protected willUpdate(changed: PropertyValues<this>): void {
+    protected override willUpdate(changed: PropertyValues<this>): void {
         if (changed.has('selected')) {
             this.manageSelected();
         }

@@ -24,7 +24,7 @@ import styles from './table-body.css.js';
  * @element sp-table
  */
 export class TableBody extends LitVirtualizer {
-    public static get styles(): CSSResultArray {
+    public static override get styles(): CSSResultArray {
         return [styles];
     }
 
@@ -32,26 +32,31 @@ export class TableBody extends LitVirtualizer {
     public role = 'rowgroup';
 
     @property({ type: Array })
-    public items: Record<string, unknown>[] = [];
+    public override items: Record<string, unknown>[] = [];
 
     public itemValue = (): string => {
         return '';
     };
 
     @property({ type: Boolean })
-    public scroller = true;
+    public override scroller = true;
 
     _firstVisible = 0;
 
     _lastVisible = 0;
 
-    get renderItem(): (item: unknown, index: number) => TemplateResult {
+    override get renderItem(): (
+        item: unknown,
+        index: number
+    ) => TemplateResult {
         return super.renderItem;
     }
 
     // do we want to include "selected/selectable" here and render it? Or do we want to
     // do that in TableRow?
-    set renderItem(fn: (item: unknown, index: number) => TemplateResult) {
+    override set renderItem(
+        fn: (item: unknown, index: number) => TemplateResult
+    ) {
         super.renderItem = (
             item: Record<string, unknown>,
             index: number
@@ -66,32 +71,4 @@ export class TableBody extends LitVirtualizer {
             `;
         };
     }
-
-    // protected handleVisibilityChanged = (event: VisibilityChangedEvent): void => {
-    //     this._firstVisible = event.first;
-    //     this._lastVisible = event.last;
-    //     // reset aria-rowindex?
-    // }
-
-    // protected handleRangeChanged = (event: RangeChangedEvent): void => {
-    //     this.
-    // }
-    // // when scrolling, we want to set the first visible element to aria-rowindex
-    // // visibilityChanged event on LitVirtualizer
-    // public connectedCallback(): void {
-    //     super.connectedCallback();
-    //     if (this.scroller) {
-    //         this.addEventListener('visibilityChanged', this.handleVisibilityChanged);
-    //         this.addEventListener('rangeChanged', this.handleRangeChanged);
-    //         // add aria-rowIndex for whatever
-    //     }
-    // }
-
-    // public disconnectedCallback(): void {
-    //     if (this.scroller) {
-    //         this.removeEventListener('visibilityChanged', this.handleVisibilityChanged);
-    //         this.removeEventListener('rangeChanged', this.handleRangeChanged);
-    // }
-    // super.disconnectedCallback();
-    // }
 }

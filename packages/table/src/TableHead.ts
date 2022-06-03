@@ -26,7 +26,7 @@ import styles from './table-head.css.js';
  * @element sp-table
  */
 export class TableHead extends SpectrumElement {
-    public static get styles(): CSSResultArray {
+    public static override get styles(): CSSResultArray {
         return [styles];
     }
 
@@ -61,7 +61,7 @@ export class TableHead extends SpectrumElement {
         this.selected = checkbox.checked || checkbox.indeterminate;
     }
 
-    protected render(): TemplateResult {
+    protected override render(): TemplateResult {
         return html`
             <slot
                 @sorted=${this.handleSorted}

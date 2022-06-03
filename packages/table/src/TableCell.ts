@@ -23,7 +23,7 @@ import styles from './table-cell.css.js';
  * @element sp-table
  */
 export class TableCell extends SpectrumElement {
-    public static get styles(): CSSResultArray {
+    public static override get styles(): CSSResultArray {
         return [styles];
     }
 
@@ -31,9 +31,9 @@ export class TableCell extends SpectrumElement {
     public role = 'gridcell';
 
     @property({ type: Number, reflect: true })
-    public tabIndex = -1;
+    public override tabIndex = -1;
 
-    protected render(): TemplateResult {
+    protected override render(): TemplateResult {
         return html`
             <slot></slot>
         `;
