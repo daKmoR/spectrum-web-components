@@ -42,3 +42,9 @@ import { Table } from '@spectrum-web-components/table';
 3. Non-virtual sorting (ie sort data supplied through the DOM)
 4. console error when we don't use Virtualizer
 5. Westbrook wants to do something and he cannot remember what it is
+
+-   [x] manually applied checkbox cell
+-   [x] initial value of selected not propagates
+-   values are "synthetic" (literal value attribute)
+-   [x] select all only selects available items
+-

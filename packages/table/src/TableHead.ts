@@ -18,7 +18,6 @@ import {
 import { property } from '@spectrum-web-components/base/src/decorators.js';
 import type { TableHeadCell } from './TableHeadCell.js';
 import { TableCheckboxCell } from './TableCheckboxCell.js';
-import { Checkbox } from '@spectrum-web-components/checkbox';
 
 import styles from './table-head.css.js';
 
@@ -33,13 +32,12 @@ export class TableHead extends SpectrumElement {
     @property({ reflect: true })
     public role = 'row';
 
-    public childCells = [] as TableHeadCell[];
-
     @property({ type: Boolean, reflect: true })
     public selected?: boolean;
 
     private handleSorted({ target }: Event): void {
         const childCells = [...this.children] as TableHeadCell[];
+        // Not sure this is in the right place.
         childCells.forEach((cell) => {
             if (cell !== target) {
                 cell.sorted = undefined;
@@ -47,18 +45,12 @@ export class TableHead extends SpectrumElement {
         });
     }
 
-    protected handleChange(): void {
-        // get the value of "checked" from the sp-checkbox
-        const checkboxCell = this.querySelector(
-            'sp-table-checkbox-cell'
-        ) as TableCheckboxCell;
-        if (!checkboxCell) return;
-
-        const checkbox = checkboxCell.shadowRoot.children[0] as Checkbox;
-        if (!checkbox) return;
-
-        // selects-single should not do anything here... right?
-        this.selected = checkbox.checked || checkbox.indeterminate;
+    protected handleChange({
+        target: checkboxCell,
+    }: Event & { target: TableCheckboxCell }): void {
+        this.selected =
+            checkboxCell.checkbox.checked ||
+            checkboxCell.checkbox.indeterminate;
     }
 
     protected override render(): TemplateResult {

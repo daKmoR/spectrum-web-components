@@ -18,6 +18,7 @@ import {
 } from '@spectrum-web-components/base';
 import { property } from '@spectrum-web-components/base/src/decorators.js';
 import styles from './table.css.js';
+import { TableBody } from './TableBody.js';
 import { TableCheckboxCell } from './TableCheckboxCell.js';
 import { TableHead } from './TableHead.js';
 import type { TableHeadCell } from './TableHeadCell.js';
@@ -43,6 +44,8 @@ export class Table extends SpectrumElement {
 
     private selectedSet = new Set<string>();
 
+    private tableHeadCheckboxCell?: TableCheckboxCell;
+
     public override focus(): void {
         const sortableHeadCell = this.querySelector(
             'sp-table-head-cell[sortable]'
@@ -52,106 +55,111 @@ export class Table extends SpectrumElement {
         }
     }
 
-    private selectRows(): void {
-        const tableRows = [
-            ...this.querySelectorAll('sp-table-row'),
-        ] as TableRow[];
-        tableRows.forEach((row) => {
-            row.selected = true; // Visually
-            this.selectedSet.add(row.value); // Prepares table state
-        });
-        this.selected = [...this.selectedSet];
+    private selectAllRows(): void {
+        const tableBody = this.querySelector('sp-table-body') as TableBody;
+        const isVirtualized = !!tableBody.items.length;
+        if (isVirtualized) {
+            tableBody.items.forEach((item, index: number) => {
+                this.selectedSet.add(tableBody.itemValue(item, index));
+            });
+            this.selected = [...this.selectedSet];
+            tableBody.selected = this.selected;
+        } else {
+            const tableRows = [
+                ...this.querySelectorAll('sp-table-row'),
+            ] as TableRow[];
+            tableRows.forEach((row) => {
+                row.selected = true; // Visually
+                this.selectedSet.add(row.value); // Prepares table state
+            });
+            this.selected = [...this.selectedSet];
+        }
 
-        const tableHeadCheckbox = this.querySelector(
-            'sp-table-head sp-table-checkbox-cell'
-        ) as TableCheckboxCell;
-        tableHeadCheckbox.checked = true;
-        tableHeadCheckbox.indeterminate = false;
+        if (!this.tableHeadCheckboxCell) return;
+        this.tableHeadCheckboxCell.checked = true;
+        this.tableHeadCheckboxCell.indeterminate = false;
     }
 
-    private deselectRows(): void {
-        const selectedRows = [
-            ...this.querySelectorAll('[selected]'),
-        ] as TableRow[];
-
-        selectedRows.forEach((row) => {
-            row.selected = false;
-        });
+    private deselectAllRows(): void {
+        const tableBody = this.querySelector('sp-table-body') as TableBody;
+        const isVirtualized = !!tableBody.items.length;
 
         this.selectedSet.clear();
         this.selected = [];
 
-        const tableHeadCheckbox = this.querySelector(
-            'sp-table-head sp-table-checkbox-cell'
-        ) as TableCheckboxCell;
-        tableHeadCheckbox.checked = false;
-        tableHeadCheckbox.indeterminate = false;
+        if (isVirtualized) {
+            tableBody.selected = this.selected;
+        } else {
+            const selectedRows = [
+                ...this.querySelectorAll('[selected]'),
+            ] as TableRow[];
+
+            selectedRows.forEach((row) => {
+                row.selected = false;
+            });
+        }
+
+        if (!this.tableHeadCheckboxCell) return;
+        this.tableHeadCheckboxCell.checked = false;
+        this.tableHeadCheckboxCell.indeterminate = false;
     }
 
     protected manageSelects(): void {
+        const tableBody = this.querySelector('sp-table-body') as TableBody;
+        tableBody.selects = this.selects;
+
         if (!!this.selects) {
-            const tableHead = this.querySelector('sp-table-head') as TableHead;
-            const tableHeadCheckbox = tableHead.querySelector(
-                'sp-table-checkbox-cell'
-            ) as TableCheckboxCell;
             const tableRows = [
                 ...this.querySelectorAll('sp-table-row'),
             ] as TableRow[];
-            const rows = this.querySelectorAll(
-                'sp-table-row'
-            ) as NodeListOf<TableRow>;
 
-            const allSelected = this.selected.length === rows.length;
+            const allSelected = this.selected.length === tableRows.length;
 
-            tableHeadCheckbox.selectsSingle = this.selects === 'single';
-            tableHeadCheckbox.checked = allSelected;
-            tableHeadCheckbox.indeterminate =
-                this.selected.length > 0 && !allSelected;
+            if (this.tableHeadCheckboxCell) {
+                this.tableHeadCheckboxCell.selectsSingle =
+                    this.selects === 'single';
+                this.tableHeadCheckboxCell.checked = allSelected;
+                this.tableHeadCheckboxCell.indeterminate =
+                    this.selected.length > 0 && !allSelected;
+            }
 
             tableRows.forEach((row) => {
-                const checkbox = this.querySelector(
-                    'sp-table-checkbox-cell'
-                ) as TableCheckboxCell;
                 row.selected = this.selectedSet.has(row.value);
-                checkbox.checked = row.selected;
             });
         } else {
-            // if user supplies .selected array
-            if (this.selected.length) {
-                return;
-            } else {
-                const checkboxes = this.querySelectorAll(
-                    'sp-table-checkbox-cell'
-                );
-                checkboxes.forEach((box) => {
-                    box.remove();
-                });
-            }
+            const checkboxes = this.querySelectorAll('sp-table-checkbox-cell');
+            checkboxes.forEach((box) => {
+                box.remove();
+            });
         }
     }
 
     // draws checkboxes on first paint
     protected manageCheckboxes(): void {
+        const tableRows = [
+            ...this.querySelectorAll('sp-table-row'),
+        ] as TableRow[];
+        const tableHead = this.querySelector('sp-table-head') as TableHead;
+
         if (!!this.selects) {
-            const tableHead = this.querySelector('sp-table-head') as TableHead;
-            const tableHeadCheckbox = document.createElement(
+            this.tableHeadCheckboxCell = document.createElement(
                 'sp-table-checkbox-cell'
             );
-            const tableRows = [
-                ...this.querySelectorAll('sp-table-row'),
-            ] as TableRow[];
-            const rows = this.querySelectorAll(
-                'sp-table-row'
-            ) as NodeListOf<TableRow>;
 
-            const allSelected = this.selected.length === rows.length;
+            const allSelected = this.selected.length === tableRows.length;
 
-            tableHeadCheckbox.selectsSingle = this.selects === 'single';
-            tableHeadCheckbox.checked = allSelected;
-            tableHeadCheckbox.indeterminate =
-                this.selected.length > 0 && !allSelected;
+            if (this.tableHeadCheckboxCell) {
+                this.tableHeadCheckboxCell.selectsSingle =
+                    this.selects === 'single';
+                this.tableHeadCheckboxCell.checked = allSelected;
+                this.tableHeadCheckboxCell.indeterminate =
+                    this.selected.length > 0 && !allSelected;
+            }
 
-            tableHead.insertAdjacentElement('afterbegin', tableHeadCheckbox);
+            tableHead.insertAdjacentElement(
+                'afterbegin',
+                this.tableHeadCheckboxCell
+            );
 
             tableRows.forEach((row) => {
                 const checkbox = document.createElement(
@@ -162,52 +170,13 @@ export class Table extends SpectrumElement {
                 checkbox.checked = row.selected;
             });
         } else {
-            // if user supplies .selected array
-            if (this.selected.length) {
-                const tableHead = this.querySelector(
-                    'sp-table-head'
-                ) as TableHead;
-                const tableHeadCheckbox = document.createElement(
-                    'sp-table-checkbox-cell'
-                );
-
-                tableHead.insertAdjacentElement(
-                    'afterbegin',
-                    tableHeadCheckbox
-                );
-
-                const tableRows = [
-                    ...this.querySelectorAll('sp-table-row'),
-                ] as TableRow[];
-                const rows = this.querySelectorAll(
-                    'sp-table-row'
-                ) as NodeListOf<TableRow>;
-
-                const allSelected = this.selected.length === rows.length;
-
-                tableHeadCheckbox.disabled = true;
-                tableHeadCheckbox.checked = allSelected;
-                tableHeadCheckbox.indeterminate =
-                    this.selected.length < rows.length && !allSelected;
-
-                tableRows.forEach((row) => {
-                    const checkbox = document.createElement(
-                        'sp-table-checkbox-cell'
-                    );
-                    row.insertAdjacentElement('afterbegin', checkbox);
-
+            tableHead.querySelector('sp-table-checkbox-cell')?.remove();
+            tableRows.forEach((row) => {
+                row.checkboxCells[0]?.remove();
+                if (this.selected.length) {
                     row.selected = this.selectedSet.has(row.value);
-                    checkbox.checked = row.selected;
-                    checkbox.disabled = true;
-                });
-            } else {
-                const checkboxes = this.querySelectorAll(
-                    'sp-table-checkbox-cell'
-                );
-                checkboxes.forEach((box) => {
-                    box.remove();
-                });
-            }
+                }
+            });
         }
     }
 
@@ -221,14 +190,14 @@ export class Table extends SpectrumElement {
         if (!rowItem.value) {
             const { checkbox } = target as TableCheckboxCell;
             if (checkbox.checked || checkbox.indeterminate) {
-                this.selectRows();
+                this.selectAllRows();
             } else {
-                this.deselectRows();
+                this.deselectAllRows();
             }
         } else {
             switch (this.selects) {
                 case 'single': {
-                    this.deselectRows();
+                    this.deselectAllRows();
                     if (rowItem.selected) {
                         this.selectedSet.add(rowItem.value);
                         this.selected = [...this.selectedSet];
@@ -249,16 +218,16 @@ export class Table extends SpectrumElement {
                     }
                     this.selected = [...this.selectedSet];
 
-                    const tableHeadCheckbox = this.querySelector(
-                        'sp-table-head sp-table-checkbox-cell'
-                    ) as TableCheckboxCell;
-                    const checkboxes = this.querySelectorAll(
-                        'sp-table-body sp-table-checkbox-cell'
-                    ) as NodeListOf<TableCheckboxCell>;
+                    const tableRows = [
+                        ...this.querySelectorAll('sp-table-row'),
+                    ] as TableRow[];
+
                     const allSelected =
-                        this.selected.length === checkboxes.length;
-                    tableHeadCheckbox.checked = allSelected;
-                    tableHeadCheckbox.indeterminate =
+                        this.selected.length === tableRows.length;
+
+                    if (!this.tableHeadCheckboxCell) return;
+                    this.tableHeadCheckboxCell.checked = allSelected;
+                    this.tableHeadCheckboxCell.indeterminate =
                         this.selected.length > 0 && !allSelected;
                     break;
                 }
@@ -266,6 +235,8 @@ export class Table extends SpectrumElement {
                     break;
                 }
             }
+            const tableBody = this.querySelector('sp-table-body') as TableBody;
+            tableBody.selected = this.selected;
         }
         event.stopPropagation();
         this.dispatchEvent(
@@ -283,16 +254,14 @@ export class Table extends SpectrumElement {
         `;
     }
 
-    public override connectedCallback(): void {
-        super.connectedCallback();
-        this.selectedSet = new Set(this.selected);
-
-        this.manageCheckboxes();
-    }
     protected override willUpdate(changed: PropertyValues<this>): void {
-        // if (!this.hasUpdated) {
-        //     this.selectedSet = new Set(this.selected);
-        // }
+        if (!this.hasUpdated) {
+            this.selectedSet = new Set(this.selected);
+            const tableBody = this.querySelector('sp-table-body') as TableBody;
+            tableBody.selected = this.selected;
+
+            this.manageCheckboxes();
+        }
         if (changed.has('selects')) {
             this.manageSelects();
         }

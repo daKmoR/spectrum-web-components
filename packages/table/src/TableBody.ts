@@ -34,8 +34,15 @@ export class TableBody extends LitVirtualizer {
     @property({ type: Array })
     public override items: Record<string, unknown>[] = [];
 
-    public itemValue = (): string => {
-        return '';
+    @property({ type: Array })
+    public selected: string[] = [];
+
+    @property({ type: String, reflect: true })
+    public selects: undefined | 'single' | 'multiple';
+
+    @property({ type: Object })
+    public itemValue = (_item: unknown, index: number): string => {
+        return '' + index;
     };
 
     @property({ type: Boolean })
@@ -61,11 +68,16 @@ export class TableBody extends LitVirtualizer {
             item: Record<string, unknown>,
             index: number
         ): TemplateResult => {
+            const value = this.itemValue(item, index);
             return html`
-                <sp-table-row
-                    value=${this.itemValue(/*item*/)}
-                    aria-rowindex=${index + 1}
-                >
+                <sp-table-row value=${value} aria-rowindex=${index + 1}>
+                    ${this.selects
+                        ? html`
+                              <sp-table-checkbox-cell
+                                  ?checked=${this.selected.includes(value)}
+                              ></sp-table-checkbox-cell>
+                          `
+                        : html``}
                     ${fn(item, index)}
                 </sp-table-row>
             `;

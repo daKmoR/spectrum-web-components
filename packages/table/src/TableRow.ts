@@ -18,9 +18,8 @@ import {
 } from '@spectrum-web-components/base';
 import {
     property,
-    // query,
+    queryAssignedElements,
 } from '@spectrum-web-components/base/src/decorators.js';
-import { Checkbox } from '@spectrum-web-components/checkbox';
 import styles from './table-row.css.js';
 import { TableCheckboxCell } from './TableCheckboxCell.js';
 
@@ -32,6 +31,12 @@ export class TableRow extends SpectrumElement {
         return [styles];
     }
 
+    @queryAssignedElements({
+        selector: 'sp-table-checkbox-cell',
+        flatten: true,
+    })
+    checkboxCells!: TableCheckboxCell[];
+
     @property({ reflect: true })
     public role = 'row';
 
@@ -41,40 +46,22 @@ export class TableRow extends SpectrumElement {
     @property({ type: String })
     public value = '';
 
-    protected handleChange(): void {
-        // get the value of "checked" from the sp-checkbox
-        const checkboxCell = this.querySelector(
-            'sp-table-checkbox-cell'
-        ) as TableCheckboxCell;
-        if (!checkboxCell) return;
-
-        const checkbox = checkboxCell.shadowRoot.children[0] as Checkbox;
-        if (!checkbox) return;
-
-        this.selected = checkbox.checked;
+    protected handleChange({
+        target: checkboxCell,
+    }: Event & { target: TableCheckboxCell }): void {
+        this.selected = checkboxCell.checkbox.checked;
     }
 
     protected manageSelected(): void {
-        const checkboxCell = this.querySelector(
-            'sp-table-checkbox-cell'
-        ) as TableCheckboxCell;
+        const [checkboxCell] = this.checkboxCells;
         if (!checkboxCell) return;
-
         checkboxCell.checked = this.selected;
     }
 
     protected override render(): TemplateResult {
         return html`
-            <slot></slot>
+            <slot @change=${this.handleChange}></slot>
         `;
-    }
-
-    // I want this to listen for the change on a checkbox Cell and to update
-    // its selected state accordingly.
-    protected override firstUpdated(changes: PropertyValues): void {
-        super.firstUpdated(changes);
-        // cache a ref to checkbox cell here bc DOM is current
-        this.addEventListener('change', this.handleChange);
     }
 
     protected override willUpdate(changed: PropertyValues<this>): void {

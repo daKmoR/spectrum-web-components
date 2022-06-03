@@ -58,6 +58,24 @@ export class TableHeadCell extends SpectrumElement {
     @property({ type: Number, reflect: true })
     public override tabIndex = -1;
 
+    protected handleClick(): void {
+        if (!this.sortable) return;
+        if (this.sorted) {
+            this.sorted = this.sorted === 'asc' ? 'desc' : 'asc';
+        } else {
+            this.sorted = 'asc';
+        }
+        this.dispatchEvent(
+            new CustomEvent<SortedEventDetails>('sorted', {
+                bubbles: true,
+                detail: {
+                    sorted: this.sorted,
+                    sortBy: this.sortBy,
+                },
+            })
+        );
+    }
+
     protected override render(): TemplateResult {
         const visiblySorted = this.sortable && !!this.sorted;
         return html`
@@ -74,23 +92,7 @@ export class TableHeadCell extends SpectrumElement {
 
     protected override firstUpdated(changes: PropertyValues): void {
         super.firstUpdated(changes);
-        this.addEventListener('click', () => {
-            if (!this.sortable) return;
-            if (this.sorted) {
-                this.sorted = this.sorted === 'asc' ? 'desc' : 'asc';
-            } else {
-                this.sorted = 'asc';
-            }
-            this.dispatchEvent(
-                new CustomEvent<SortedEventDetails>('sorted', {
-                    bubbles: true,
-                    detail: {
-                        sorted: this.sorted,
-                        sortBy: this.sortBy,
-                    },
-                })
-            );
-        });
+        this.addEventListener('click', this.handleClick);
     }
 
     protected override update(changes: PropertyValues): void {
