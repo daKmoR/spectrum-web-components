@@ -44,7 +44,15 @@ export class Table extends SpectrumElement {
 
     private selectedSet = new Set<string>();
 
+    protected get tableBody(): TableBody {
+        return this.querySelector('sp-table-body') as TableBody;
+    }
+
     private tableHeadCheckboxCell?: TableCheckboxCell;
+
+    private get isVirtualized(): boolean {
+        return !!this.tableBody.items.length;
+    }
 
     public override focus(): void {
         const sortableHeadCell = this.querySelector(
@@ -56,14 +64,12 @@ export class Table extends SpectrumElement {
     }
 
     private selectAllRows(): void {
-        const tableBody = this.querySelector('sp-table-body') as TableBody;
-        const isVirtualized = !!tableBody.items.length;
-        if (isVirtualized) {
-            tableBody.items.forEach((item, index: number) => {
-                this.selectedSet.add(tableBody.itemValue(item, index));
+        if (this.isVirtualized) {
+            this.tableBody.items.forEach((item, index: number) => {
+                this.selectedSet.add(this.tableBody.itemValue(item, index));
             });
             this.selected = [...this.selectedSet];
-            tableBody.selected = this.selected;
+            this.tableBody.selected = this.selected;
         } else {
             const tableRows = [
                 ...this.querySelectorAll('sp-table-row'),
@@ -81,14 +87,11 @@ export class Table extends SpectrumElement {
     }
 
     private deselectAllRows(): void {
-        const tableBody = this.querySelector('sp-table-body') as TableBody;
-        const isVirtualized = !!tableBody.items.length;
-
         this.selectedSet.clear();
         this.selected = [];
 
-        if (isVirtualized) {
-            tableBody.selected = this.selected;
+        if (this.isVirtualized) {
+            this.tableBody.selected = this.selected;
         } else {
             const selectedRows = [
                 ...this.querySelectorAll('[selected]'),
@@ -105,16 +108,24 @@ export class Table extends SpectrumElement {
     }
 
     protected manageSelects(): void {
-        const tableBody = this.querySelector('sp-table-body') as TableBody;
-        tableBody.selects = this.selects;
+        this.tableBody.selects = this.selects;
 
         if (!!this.selects) {
-            const tableRows = [
-                ...this.querySelectorAll('sp-table-row'),
-            ] as TableRow[];
+            let allSelected = false;
+            if (this.isVirtualized) {
+                allSelected =
+                    this.selected.length === this.tableBody.items.length;
+            } else {
+                const tableRows = [
+                    ...this.querySelectorAll('sp-table-row'),
+                ] as TableRow[];
 
-            const allSelected = this.selected.length === tableRows.length;
+                tableRows.forEach((row) => {
+                    row.selected = this.selectedSet.has(row.value);
+                });
 
+                allSelected = this.selected.length === tableRows.length;
+            }
             if (this.tableHeadCheckboxCell) {
                 this.tableHeadCheckboxCell.selectsSingle =
                     this.selects === 'single';
@@ -122,10 +133,6 @@ export class Table extends SpectrumElement {
                 this.tableHeadCheckboxCell.indeterminate =
                     this.selected.length > 0 && !allSelected;
             }
-
-            tableRows.forEach((row) => {
-                row.selected = this.selectedSet.has(row.value);
-            });
         } else {
             const checkboxes = this.querySelectorAll('sp-table-checkbox-cell');
             checkboxes.forEach((box) => {
@@ -145,7 +152,6 @@ export class Table extends SpectrumElement {
             this.tableHeadCheckboxCell = document.createElement(
                 'sp-table-checkbox-cell'
             );
-
             const allSelected = this.selected.length === tableRows.length;
 
             if (this.tableHeadCheckboxCell) {
@@ -235,8 +241,7 @@ export class Table extends SpectrumElement {
                     break;
                 }
             }
-            const tableBody = this.querySelector('sp-table-body') as TableBody;
-            tableBody.selected = this.selected;
+            this.tableBody.selected = this.selected;
         }
         event.stopPropagation();
         this.dispatchEvent(
@@ -256,9 +261,38 @@ export class Table extends SpectrumElement {
 
     protected override willUpdate(changed: PropertyValues<this>): void {
         if (!this.hasUpdated) {
+            const rowValues = new Set<string>();
+
+            if (this.isVirtualized) {
+                this.tableBody.items.forEach((item, index) => {
+                    const value = this.tableBody.itemValue(item, index);
+                    rowValues.add(value);
+                });
+            } else {
+                const tableRows = [
+                    ...this.querySelectorAll('sp-table-row'),
+                ] as TableRow[];
+                tableRows.forEach((row) => {
+                    rowValues.add(row.value);
+                });
+            }
+
+            const oldSelectedCount = this.selected.length;
+
+            this.selected = this.selected.filter((selectedItem) =>
+                rowValues.has(selectedItem)
+            );
+            if (oldSelectedCount !== this.selected.length) {
+                this.dispatchEvent(
+                    new Event('change', {
+                        cancelable: true,
+                        bubbles: true,
+                        composed: true,
+                    })
+                );
+            }
             this.selectedSet = new Set(this.selected);
-            const tableBody = this.querySelector('sp-table-body') as TableBody;
-            tableBody.selected = this.selected;
+            this.tableBody.selected = this.selected;
 
             this.manageCheckboxes();
         }

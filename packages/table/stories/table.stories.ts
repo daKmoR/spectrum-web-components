@@ -186,12 +186,12 @@ export const virtualized = (): TemplateResult => {
     `;
 };
 
-interface Item extends Record<string, unknown> {
+export interface Item extends Record<string, unknown> {
     name: string;
     date: number;
 }
 
-function makeItemsTwo(count: number): Item[] {
+export function makeItemsTwo(count: number): Item[] {
     const total = count;
     const items: Item[] = [];
     while (count) {
@@ -310,7 +310,7 @@ export const virtualizedCustomValue = (): TemplateResult => {
         <sp-table
             size="m"
             selects="multiple"
-            .selected=${['0', '48']}
+            .selected=${['0', '48', 'applied-47']}
             @change=${({ target }: Event & { target: Table }) => {
                 const next = target.nextElementSibling as HTMLDivElement;
                 next.textContent = `Selected: ${JSON.stringify(
@@ -339,7 +339,7 @@ export const virtualizedCustomValue = (): TemplateResult => {
                 scroller
             ></sp-table-body>
         </sp-table>
-        <div>Selected: ["0", "48"]</div>
+        <div>Selected: ["0", "48", "applied-47"]</div>
         <div>Selected Count: 2</div>
     `;
 };

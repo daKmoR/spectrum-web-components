@@ -9,7 +9,13 @@ the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTA
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 */
-import { elementUpdated, expect, fixture, html } from '@open-wc/testing';
+import {
+    elementUpdated,
+    expect,
+    fixture,
+    html,
+    oneEvent,
+} from '@open-wc/testing';
 
 import '../sp-table.js';
 import '../sp-table-head.js';
@@ -20,15 +26,22 @@ import '../sp-table-cell.js';
 import { Table } from '../';
 import {
     elements,
+    Item,
+    makeItemsTwo,
     selectsMultiple,
     selectsSingle,
     virtualized,
+    virtualizedCustomValue,
+    virtualizedMultiple,
+    virtualizedSingle,
 } from '../stories/table.stories.js';
 import { TableHeadCell } from '../src/TableHeadCell.js';
 import { sendKeys } from '@web/test-runner-commands';
 import { TableRow } from '../src/TableRow.js';
 import { spy } from 'sinon';
 import { TableCheckboxCell } from '../src/TableCheckboxCell.js';
+import { TemplateResult } from '@spectrum-web-components/base';
+import { TableBody } from '../src/TableBody.js';
 // import { Checkbox } from '@spectrum-web-components/checkbox/src/Checkbox';
 // import { TableBody } from '../src/TableBody.js';
 
@@ -225,12 +238,26 @@ describe('Table', () => {
         ]);
         expect(changeSpy.callCount).to.equal(2);
         expect(changeSpy.calledWithExactly(el)).to.be.true;
+
+        // TEST FOR CHANGED VALUES ON CHANGING .SELECTED
+    });
+
+    it('validates `value` property to make sure it matches the values in `selected`', async () => {
+        const el = await fixture<Table>(virtualizedCustomValue());
+
+        expect(el.selected).to.deep.equal(['applied-47']);
     });
 
     it('surfaces [selects="single"] selection', async () => {
         const el = await fixture<Table>(selectsSingle());
 
         expect(el.selected, "'Row 1 selected").to.deep.equal(['row1']);
+    });
+
+    it('surfaces [selects="single"] selection on Virtualized Table', async () => {
+        const el = await fixture<Table>(virtualizedSingle());
+
+        expect(el.selected, "'Row 1 selected").to.deep.equal(['0']);
     });
 
     it('surfaces [selects="multiple"] selection', async () => {
@@ -240,6 +267,12 @@ describe('Table', () => {
             'row1',
             'row2',
         ]);
+    });
+
+    it('surfaces [selects="multiple"] selection on Virtualized Table', async () => {
+        const el = await fixture<Table>(virtualizedMultiple());
+
+        expect(el.selected, 'Rows 1 and 2 selected').to.deep.equal(['0', '48']);
     });
 
     it('selects a user-passed value for .selected array with no [selects="single"] specified, but does not allow interaction afterwards', async () => {
@@ -277,19 +310,48 @@ describe('Table', () => {
 
         const rowThree = el.querySelector('.row3') as TableRow;
         const rowTwo = el.querySelector('.row2') as TableRow;
-        const rowTwoCheckbox = rowTwo.querySelector(
-            'sp-table-checkbox-cell'
-        ) as TableCheckboxCell;
+        const rowTwoCheckbox = rowTwo.querySelector('sp-table-checkbox-cell');
 
         expect(rowThree.selected, 'third row selected').to.be.true;
         expect(rowTwo.selected, 'second row selected').to.be.false;
+        expect(rowTwoCheckbox).to.be.null;
+    });
 
-        rowTwoCheckbox.click();
-        await elementUpdated(el);
+    it('selects a user-passed value for .selected array with no [selects="single"] specified, but does not allow interaction afterwards', async () => {
+        const virtualItems = makeItemsTwo(50);
+        const renderItem = (item: Item, index: number): TemplateResult => {
+            return html`
+                <sp-table-cell>Rowsa Item Alpha ${item.name}</sp-table-cell>
+                <sp-table-cell>Row Item Alpha ${item.date}</sp-table-cell>
+                <sp-table-cell>Row Item Alpha ${index}</sp-table-cell>
+            `;
+        };
 
+        const el = await fixture<Table>(html`
+            <sp-table .selected=${['0']}>
+                <sp-table-head>
+                    <sp-table-head-cell sortable sortby="name" sorted="desc">
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                </sp-table-head>
+                <sp-table-body
+                    style="height: 120px"
+                    .items=${virtualItems}
+                    .renderItem=${renderItem}
+                    scroller?="true"
+                ></sp-table-body>
+            </sp-table>
+        `);
         expect(el.selected.length).to.equal(1);
-        expect(rowThree.selected, 'third row selected').to.be.true;
-        expect(rowTwo.selected, 'second row selected').to.be.false;
+
+        const tableBody = el.querySelector('sp-table-body') as TableBody;
+        await oneEvent(tableBody, 'rangeChanged');
+        await elementUpdated(tableBody);
+
+        const rowOneItem = tableBody.querySelector('[value="0"]') as TableRow;
+        expect(rowOneItem.value).to.equal('0');
     });
 
     it('selects user-passed values for .selected array with no [selects="multiple"] specified, but does not allow interaction afterwards', async () => {
@@ -328,24 +390,15 @@ describe('Table', () => {
         const rowThree = el.querySelector('.row3') as TableRow;
         const rowTwo = el.querySelector('.row2') as TableRow;
         const rowOne = el.querySelector('.row1') as TableRow;
-        const rowOneCheckbox = rowOne.querySelector(
-            'sp-table-checkbox-cell'
-        ) as TableCheckboxCell;
+        const rowOneCheckbox = rowOne.querySelector('sp-table-checkbox-cell');
 
         expect(rowThree.selected, 'third row selected').to.be.true;
         expect(rowTwo.selected, 'second row selected').to.be.true;
         expect(rowOne.selected, 'first row selected').to.be.false;
-
-        rowOneCheckbox.click();
-        await elementUpdated(el);
-
-        expect(el.selected.length).to.equal(2);
-        expect(rowThree.selected, 'third row selected').to.be.true;
-        expect(rowTwo.selected, 'second row selected').to.be.true;
-        expect(rowOne.selected, 'first row selected').to.be.false;
+        expect(rowOneCheckbox).to.be.null;
     });
 
-    xit('selects via `click` while [selects="single"]', async () => {
+    it('selects via `click` while [selects="single"]', async () => {
         const el = await fixture<Table>(html`
             <sp-table size="m" selects="single">
                 <sp-table-head>
@@ -363,7 +416,7 @@ describe('Table', () => {
                         <sp-table-cell>Row Item Alpha</sp-table-cell>
                         <sp-table-cell>Row Item Alpha</sp-table-cell>
                     </sp-table-row>
-                    <sp-table-row value="row2" selected>
+                    <sp-table-row value="row2" class="row2">
                         <sp-table-cell>Row Item Bravo</sp-table-cell>
                         <sp-table-cell>Row Item Bravo</sp-table-cell>
                         <sp-table-cell>Row Item Bravo</sp-table-cell>
@@ -386,19 +439,21 @@ describe('Table', () => {
                 </sp-table-body>
             </sp-table>
         `);
-        const thirdRow = el.querySelector('.row3') as TableRow;
+        const rowTwo = el.querySelector('.row2') as TableRow;
+        const rowTwoCheckbox = rowTwo.querySelector(
+            'sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
 
         await elementUpdated(el);
         expect(el.selected.length).to.equal(0);
-        // fails bc we haven't dealt with attribute-based selection yet
 
-        expect(el.selected.includes('row2'));
-
-        thirdRow.click();
+        rowTwoCheckbox.click();
         await elementUpdated(el);
 
-        expect(thirdRow.selected).to.be.true;
+        expect(rowTwoCheckbox.checked).to.be.true;
+        expect(el.selected.includes('row2')).to.be.true; // change this to deep equal
     });
 
     xit('selects via `click` while  [selects="multiple"] selection');
+    // select all clicks matter too !! test for the head checkbox as well
 });

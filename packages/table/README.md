@@ -34,17 +34,24 @@ import { Table } from '@spectrum-web-components/table';
 1. Test for: change event on tablehead checkbox cell;
 2. Scrolling w/ screenreader on virtualised table elements
 3. make selection work with virtualised elements. rip.
+4. Allow selects to be changed past render time
+5. Allow .selected values to be added after rendering
+6. Value for `selected` is managed in two different places. Stop doing that.
 
 -   NOT CURRENTLY NEEDED but still important
 
 1. multiselects via attributes (not required for Express delivery)
 2. Update checkbox element to dispatch event correctly
 3. Non-virtual sorting (ie sort data supplied through the DOM)
-4. console error when we don't use Virtualizer
-5. Westbrook wants to do something and he cannot remember what it is
+4. Handle the console error that happens when we don't use Virtualizer
+5. Manage sort internally & prevent sort events
+6. Preventing change events
 
 -   [x] manually applied checkbox cell
 -   [x] initial value of selected not propagates
 -   values are "synthetic" (literal value attribute)
 -   [x] select all only selects available items
--
+-   [x] selected value needs to be validated
+-   [x] check that tests still pass
+-   [ ] write tests for virtualised table
+-   [ ] review tab order entries for checkboxes
