@@ -12,7 +12,6 @@ governing permissions and limitations under the License.
 import {
     CSSResultArray,
     html,
-    // PropertyValues,
     SpectrumElement,
     TemplateResult,
 } from '@spectrum-web-components/base';
@@ -76,14 +75,4 @@ export class TableCheckboxCell extends SpectrumElement {
             ></sp-checkbox>
         `;
     }
-
-    // protected override update(changes: PropertyValues): void {
-    //     if (changes.has('checked' || 'indeterminate')) {
-    //         this.tabIndex = 0;
-    //     }
-    //     if (changes.has('disabled')) {
-    //         this.tabIndex = -1;
-    //     }
-    //     super.update(changes);
-    // }
 }

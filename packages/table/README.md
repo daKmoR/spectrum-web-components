@@ -33,10 +33,20 @@ import { Table } from '@spectrum-web-components/table';
 
 1. Test for: change event on tablehead checkbox cell;
 2. Scrolling w/ screenreader on virtualised table elements
-3. make selection work with virtualised elements. rip.
-4. Allow selects to be changed past render time
-5. Allow .selected values to be added after rendering
-6. Value for `selected` is managed in two different places. Stop doing that.
+3. Allow selects to be changed past render time
+4. Allow .selected values to be added after rendering
+5. Value for `selected` is managed in two different places. Stop doing that.
+
+-   [x] manually applied checkbox cell
+-   [x] initial value of selected not propagates
+-   values are "synthetic" (literal value attribute)
+-   [x] select all only selects available items
+-   [x] selected value needs to be validated
+-   [x] check that tests still pass
+-   [x] write tests for virtualised table
+-   [x] review tab order entries for checkboxes
+-   [ ] scroll with screen reader on virtualised table elements
+-   [x] test for click selection on table checkboxes
 
 -   NOT CURRENTLY NEEDED but still important
 
@@ -46,12 +56,3 @@ import { Table } from '@spectrum-web-components/table';
 4. Handle the console error that happens when we don't use Virtualizer
 5. Manage sort internally & prevent sort events
 6. Preventing change events
-
--   [x] manually applied checkbox cell
--   [x] initial value of selected not propagates
--   values are "synthetic" (literal value attribute)
--   [x] select all only selects available items
--   [x] selected value needs to be validated
--   [x] check that tests still pass
--   [ ] write tests for virtualised table
--   [ ] review tab order entries for checkboxes
