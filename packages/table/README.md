@@ -29,13 +29,7 @@ import { Table } from '@spectrum-web-components/table';
 
 ## Questions
 
--   Next steparoonies:
-
-1. Test for: change event on tablehead checkbox cell;
-2. Scrolling w/ screenreader on virtualised table elements
-3. Allow selects to be changed past render time
-4. Allow .selected values to be added after rendering
-5. Value for `selected` is managed in two different places. Stop doing that.
+-   TO-DO:
 
 -   [x] manually applied checkbox cell
 -   [x] initial value of selected not propagates
@@ -45,8 +39,15 @@ import { Table } from '@spectrum-web-components/table';
 -   [x] check that tests still pass
 -   [x] write tests for virtualised table
 -   [x] review tab order entries for checkboxes
--   [ ] scroll with screen reader on virtualised table elements
+-   [x] scroll with screen reader on virtualised table elements
 -   [x] test for click selection on table checkboxes
+-   [ ] Allow selects to be changed by the application on head checkbox <-- test this
+-   [x] Fix bug: Virtualised table does not row select on first update
+-   [ ] Write tests for RangeChanged and VisbilityChanged events on sp table via spy()ing
+-   [x] Move makeItemsTwo into index storybook file
+-   [x] Value for `selected` is managed in two different places. Stop doing that.
+-   [ ] ## Write a test to make sure select all triggers appropriately. ie items = 0 and selected length = 0 should not be true selectAll...
+-   [ ] Scrolling w/ screenreader on virtualised table elements
 
 -   NOT CURRENTLY NEEDED but still important
 

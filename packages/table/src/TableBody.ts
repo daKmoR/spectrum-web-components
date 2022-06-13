@@ -12,18 +12,16 @@ governing permissions and limitations under the License.
 import {
     CSSResultArray,
     html,
+    SpectrumElement,
     TemplateResult,
 } from '@spectrum-web-components/base';
 import { property } from '@spectrum-web-components/base/src/decorators.js';
-import { LitVirtualizer } from '@lit-labs/virtualizer/LitVirtualizer.js';
-// import { VisibilityChangedEvent, RangeChangedEvent } from '@lit-labs/virtualizer/Virtualizer.js';
 import styles from './table-body.css.js';
-// import { TableRow } from './table-row.js';
 
 /**
  * @element sp-table
  */
-export class TableBody extends LitVirtualizer {
+export class TableBody extends SpectrumElement {
     public static override get styles(): CSSResultArray {
         return [styles];
     }
@@ -31,56 +29,9 @@ export class TableBody extends LitVirtualizer {
     @property({ reflect: true })
     public role = 'rowgroup';
 
-    @property({ type: Array })
-    public override items: Record<string, unknown>[] = [];
-
-    @property({ type: Array })
-    public selected: string[] = [];
-
-    @property({ type: String, reflect: true })
-    public selects: undefined | 'single' | 'multiple';
-
-    @property({ type: Object })
-    public itemValue = (_item: unknown, index: number): string => {
-        return '' + index;
-    };
-
-    @property({ type: Boolean })
-    public override scroller = true;
-
-    _firstVisible = 0;
-
-    _lastVisible = 0;
-
-    override get renderItem(): (
-        item: unknown,
-        index: number
-    ) => TemplateResult {
-        return super.renderItem;
-    }
-
-    // do we want to include "selected/selectable" here and render it? Or do we want to
-    // do that in TableRow?
-    override set renderItem(
-        fn: (item: unknown, index: number) => TemplateResult
-    ) {
-        super.renderItem = (
-            item: Record<string, unknown>,
-            index: number
-        ): TemplateResult => {
-            const value = this.itemValue(item, index);
-            return html`
-                <sp-table-row value=${value} aria-rowindex=${index + 1}>
-                    ${this.selects
-                        ? html`
-                              <sp-table-checkbox-cell
-                                  ?checked=${this.selected.includes(value)}
-                              ></sp-table-checkbox-cell>
-                          `
-                        : html``}
-                    ${fn(item, index)}
-                </sp-table-row>
-            `;
-        };
+    protected override render(): TemplateResult {
+        return html`
+            <slot></slot>
+        `;
     }
 }
