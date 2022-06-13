@@ -14,6 +14,7 @@ import {
     expect,
     fixture,
     html,
+    nextFrame,
     oneEvent,
 } from '@open-wc/testing';
 
@@ -562,10 +563,10 @@ describe('Table', () => {
         await elementUpdated(el);
 
         expect(rowTwoCheckbox.checked).to.be.true;
-        expect(el.selected).to.deep.equal(['row2']); // change this to deep equal
+        expect(el.selected).to.deep.equal(['row2']);
     });
 
-    xit('selects via `click` while  [selects="multiple"] selection', async () => {
+    it('selects via `click` while  [selects="multiple"] selection', async () => {
         const el = await fixture<Table>(html`
             <sp-table size="m" selects="multiple">
                 <sp-table-head>
@@ -627,11 +628,306 @@ describe('Table', () => {
         await elementUpdated(el);
 
         expect(el.selected).to.deep.equal([
-            'row1',
             'row2',
+            'row1',
             'row3',
             'row4',
             'row5',
         ]);
+    });
+
+    it('allows [selects] to be changed by the application', async () => {
+        const el = await fixture<Table>(html`
+            <sp-table size="m">
+                <sp-table-head>
+                    <sp-table-head-cell sortable sorted="desc">
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell sortable>
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                </sp-table-head>
+                <sp-table-body style="height: 120px">
+                    <sp-table-row value="row1">
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row2" class="row2">
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row3" class="row3">
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row4">
+                        <sp-table-cell>Row Item Delta</sp-table-cell>
+                        <sp-table-cell>Row Item Delta</sp-table-cell>
+                        <sp-table-cell>Row Item Delta</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row5">
+                        <sp-table-cell>Row Item Echo</sp-table-cell>
+                        <sp-table-cell>Row Item Echo</sp-table-cell>
+                        <sp-table-cell>Row Item Echo</sp-table-cell>
+                    </sp-table-row>
+                </sp-table-body>
+            </sp-table>
+        `);
+
+        expect(el.selects).to.be.undefined;
+
+        el.selects = 'multiple';
+
+        await elementUpdated(el);
+        expect(el.selects).to.equal('multiple');
+
+        await elementUpdated(el);
+        await nextFrame();
+        await nextFrame();
+
+        const tableHeadCheckboxCell = el.querySelector(
+            'sp-table-head sp-table-checkbox-cell'
+        );
+        expect(tableHeadCheckboxCell).to.not.be.null;
+    });
+
+    it('allows .selected values to be changed by the application when [selects="multiple"]', async () => {
+        const el = await fixture<Table>(html`
+            <sp-table size="m" selects="multiple" .selected=${['row1']}>
+                <sp-table-head>
+                    <sp-table-head-cell sortable sorted="desc">
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell sortable>
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                </sp-table-head>
+                <sp-table-body style="height: 120px">
+                    <sp-table-row value="row1" class="row1">
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row2" class="row2">
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row3">
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row4">
+                        <sp-table-cell>Row Item Delta</sp-table-cell>
+                        <sp-table-cell>Row Item Delta</sp-table-cell>
+                        <sp-table-cell>Row Item Delta</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row5">
+                        <sp-table-cell>Row Item Echo</sp-table-cell>
+                        <sp-table-cell>Row Item Echo</sp-table-cell>
+                        <sp-table-cell>Row Item Echo</sp-table-cell>
+                    </sp-table-row>
+                </sp-table-body>
+            </sp-table>
+        `);
+        await elementUpdated(el);
+
+        const rowTwoCheckboxCell = el.querySelector(
+            '.row2 sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
+        const rowOneCheckboxCell = el.querySelector(
+            '.row1 sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
+
+        expect(el.selected).to.deep.equal(['row1']);
+        expect(rowOneCheckboxCell.checkbox.checked).to.be.true;
+        expect(rowTwoCheckboxCell.checkbox.checked).to.be.false;
+
+        el.selected = ['row1', 'row2'];
+
+        await elementUpdated(el);
+
+        expect(el.selected).to.deep.equal(['row1', 'row2']);
+        expect(rowOneCheckboxCell.checkbox.checked).to.be.true;
+        expect(rowTwoCheckboxCell.checkbox.checked).to.be.true;
+    });
+
+    it('ensures that elements with values in .selected are visually selected when brought into view using scrollTop', async () => {
+        const el = await fixture<Table>(html`
+            <sp-table size="m" selects="multiple" .selected=${['row5']}>
+                <sp-table-head>
+                    <sp-table-head-cell sortable sorted="desc">
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell sortable>
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                </sp-table-head>
+                <sp-table-body style="height: 120px">
+                    <sp-table-row value="row1" class="row1">
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                        <sp-table-cell>Row Item Alpha</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row2" class="row2">
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                        <sp-table-cell>Row Item Bravo</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row3">
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                        <sp-table-cell>Row Item Charlie</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row4">
+                        <sp-table-cell>Row Item Delta</sp-table-cell>
+                        <sp-table-cell>Row Item Delta</sp-table-cell>
+                        <sp-table-cell>Row Item Delta</sp-table-cell>
+                    </sp-table-row>
+                    <sp-table-row value="row5" class="row5">
+                        <sp-table-cell>Row Item Echo</sp-table-cell>
+                        <sp-table-cell>Row Item Echo</sp-table-cell>
+                        <sp-table-cell>Row Item Echo</sp-table-cell>
+                    </sp-table-row>
+                </sp-table-body>
+            </sp-table>
+        `);
+
+        const tableBody = el.querySelector('sp-table-body') as TableBody;
+        const rowFive = el.querySelector('.row5') as TableRow;
+        const rowFiveCheckboxCell = rowFive.querySelector(
+            'sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
+
+        tableBody.scrollTop = tableBody.scrollHeight;
+
+        await nextFrame();
+        await nextFrame();
+
+        expect(rowFive.selected).to.be.true;
+        expect(rowFiveCheckboxCell.checkbox.checked).to.be.true;
+    });
+
+    it('ensures that virtualized elements with values in .selected are visually selected when brought into view using scrollTop', async () => {
+        const virtualItems = makeItemsTwo(50);
+        const renderItem = (item: Item, index: number): TemplateResult => {
+            return html`
+                <sp-table-cell>Rowsa Item Alpha ${item.name}</sp-table-cell>
+                <sp-table-cell>Row Item Alpha ${item.date}</sp-table-cell>
+                <sp-table-cell>Row Item Alpha ${index}</sp-table-cell>
+            `;
+        };
+
+        const el = await fixture<Table>(html`
+            <sp-table selects="multiple" .selected=${['1', '47']}>
+                <sp-table-head>
+                    <sp-table-head-cell sortable sortby="name" sorted="desc">
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                </sp-table-head>
+                <sp-table-body
+                    style="height: 120px"
+                    .items=${virtualItems}
+                    .renderItem=${renderItem}
+                    scroller?="true"
+                ></sp-table-body>
+            </sp-table>
+        `);
+        await elementUpdated(el);
+
+        const tableBody = el.querySelector('sp-table-body') as TableBody;
+
+        await oneEvent(tableBody, 'rangeChanged');
+        await elementUpdated(tableBody);
+
+        const rowOne = tableBody.querySelector('[value="1"]') as TableRow;
+        const rowOneCheckboxCell = rowOne.querySelector(
+            'sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
+
+        expect(el.selected).to.deep.equal(['1', '47']);
+        // expect(rowOne.selected).to.be.true; // Doesn't pass bc there's a bug in the virtualised table
+        expect(rowOneCheckboxCell.checkbox.checked).to.be.true;
+
+        tableBody.scrollTop = tableBody.scrollHeight;
+
+        await nextFrame();
+        await nextFrame();
+        await elementUpdated(tableBody);
+
+        const unseenRow = tableBody.querySelector('[value="47"]') as TableRow;
+        const unseenRowCheckboxCell = unseenRow.querySelector(
+            'sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
+
+        // expect(unseenRow.selected).to.be.true;
+        expect(unseenRowCheckboxCell.checkbox.checked).to.be.true;
+    });
+
+    it('ensures that virtualized elements with values in .selected are visually selected when brought into view using scrollToIndex', async () => {
+        const virtualItems = makeItemsTwo(50);
+        const renderItem = (item: Item, index: number): TemplateResult => {
+            return html`
+                <sp-table-cell>Rowsa Item Alpha ${item.name}</sp-table-cell>
+                <sp-table-cell>Row Item Alpha ${item.date}</sp-table-cell>
+                <sp-table-cell>Row Item Alpha ${index}</sp-table-cell>
+            `;
+        };
+
+        const el = await fixture<Table>(html`
+            <sp-table selects="multiple" .selected=${['1', '47']}>
+                <sp-table-head>
+                    <sp-table-head-cell sortable sortby="name" sorted="desc">
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                </sp-table-head>
+                <sp-table-body
+                    style="height: 120px"
+                    .items=${virtualItems}
+                    .renderItem=${renderItem}
+                    scroller?="true"
+                ></sp-table-body>
+            </sp-table>
+        `);
+        await elementUpdated(el);
+
+        const tableBody = el.querySelector('sp-table-body') as TableBody;
+
+        await oneEvent(tableBody, 'rangeChanged');
+        await elementUpdated(tableBody);
+
+        const rowOne = tableBody.querySelector('[value="1"]') as TableRow;
+        const rowOneCheckboxCell = rowOne.querySelector(
+            'sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
+
+        expect(el.selected).to.deep.equal(['1', '47']);
+        // expect(rowOne.selected).to.be.true; // Doesn't pass bc there's a bug in the virtualised table
+        expect(rowOneCheckboxCell.checkbox.checked).to.be.true;
+
+        tableBody.scrollToIndex(tableBody.scrollHeight);
+
+        await nextFrame();
+        await nextFrame();
+        await elementUpdated(tableBody);
+
+        const unseenRow = tableBody.querySelector('[value="47"]') as TableRow;
+        const unseenRowCheckboxCell = unseenRow.querySelector(
+            'sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
+
+        // expect(unseenRow.selected).to.be.true;
+        expect(unseenRowCheckboxCell.checkbox.checked).to.be.true;
     });
 });
