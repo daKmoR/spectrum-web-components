@@ -41,12 +41,12 @@ import { Table } from '@spectrum-web-components/table';
 -   [x] review tab order entries for checkboxes
 -   [x] scroll with screen reader on virtualised table elements
 -   [x] test for click selection on table checkboxes
--   [ ] Allow selects to be changed by the application on head checkbox <-- test this
+-   [x] Allow selects to be changed by the application on head checkbox
 -   [x] Fix bug: Virtualised table does not row select on first update
 -   [ ] Write tests for RangeChanged and VisbilityChanged events on sp table via spy()ing
 -   [x] Move makeItemsTwo into index storybook file
 -   [x] Value for `selected` is managed in two different places. Stop doing that.
--   [ ] ## Write a test to make sure select all triggers appropriately. ie items = 0 and selected length = 0 should not be true selectAll...
+-   [x] ## Write a test to make sure select all triggers appropriately. ie items = 0 and selected length = 0 should not be true selectAll...
 -   [ ] Scrolling w/ screenreader on virtualised table elements
 
 -   NOT CURRENTLY NEEDED but still important
