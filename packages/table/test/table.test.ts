@@ -314,8 +314,8 @@ describe('Table', () => {
         ]);
     });
 
-    it('accepts `rangeChanged` events on Virtualized Table', async () => {
-        const changeSpy = spy();
+    xit('dispatches `rangeChanged` events on Virtualized Table', async () => {
+        // console.log('This test');
         const virtualItems = makeItemsTwo(50);
 
         const el = await fixture<Table>(html`
@@ -326,34 +326,45 @@ describe('Table', () => {
                 .items=${virtualItems}
                 .renderItem=${renderItem}
                 scroller?="true"
-                @rangeChanged=${({ target }: Event & { target: Table }) => {
-                    changeSpy(target);
-                }}
             >
                 <sp-table-head>
-                    <sp-table-head-cell sortable sortby="name" sorted="desc">
-                        Column Title
-                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
             </sp-table>
         `);
+        // console.log(1);
+        await nextFrame();
+        // console.log(2);
+        await nextFrame();
+        // console.log(3);
+        await nextFrame();
+        // debugger;
 
         expect(el.selected).to.deep.equal(['1', '47']);
 
+        // console.log('4a');
+        const rangeChanged = oneEvent(el, 'rangeChanged');
+        // console.log(4);
+        let tableRow = el.querySelector('sp-table-row') as TableRow;
+        const initialValue = tableRow.value;
         el.scrollToIndex(47);
-
+        // (el as unknown as { tableBody: TableBody }).tableBody.scrollTop = (el as unknown as { tableBody: TableBody }).tableBody.scrollHeight;
+        // console.log('we await after this...');
         await nextFrame();
         await nextFrame();
-        await elementUpdated(el);
+        // debugger;
+        await rangeChanged;
+        tableRow = el.querySelector('sp-table-row') as TableRow;
+        const newValue = tableRow.value;
 
-        // What am I testing for?
-        expect(changeSpy.calledWithExactly(el)).to.be.true;
+        expect(newValue).to.not.equal(initialValue);
     });
 
-    xit('accepts `visibilityChanged` events on Virtualized Table', async () => {
-        const changeSpy = spy();
+    it('dispatches `visibilityChanged` events on Virtualized Table', async () => {
+        // console.log('NOT this test');
+        const visibilityChangedSpy = spy();
         const virtualItems = makeItemsTwo(50);
 
         const el = await fixture<Table>(html`
@@ -367,8 +378,42 @@ describe('Table', () => {
                 @visibilityChanged=${({
                     target,
                 }: Event & { target: Table }) => {
-                    changeSpy(target);
+                    visibilityChangedSpy(target);
                 }}
+            >
+                <sp-table-head>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                </sp-table-head>
+            </sp-table>
+        `);
+        await nextFrame();
+        await nextFrame();
+        await nextFrame();
+
+        expect(el.selected).to.deep.equal(['1', '47']);
+
+        el.scrollToIndex(47);
+
+        await nextFrame();
+        await nextFrame();
+        await elementUpdated(el);
+
+        expect(visibilityChangedSpy.called).to.be.true;
+    });
+
+    it('selects all checkboxes in Virtualized Table when clicking the TableHeadCheckboxCell', async () => {
+        const virtualItems = makeItemsTwo(50);
+
+        const el = await fixture<Table>(html`
+            <sp-table
+                selects="multiple"
+                .selected=${['1', '47']}
+                style="height: 120px"
+                .items=${virtualItems}
+                .renderItem=${renderItem}
+                scroller?="true"
             >
                 <sp-table-head>
                     <sp-table-head-cell sortable sortby="name" sorted="desc">
@@ -379,17 +424,17 @@ describe('Table', () => {
                 </sp-table-head>
             </sp-table>
         `);
+        await elementUpdated(el);
 
         expect(el.selected).to.deep.equal(['1', '47']);
 
-        el.scrollToIndex(47);
+        const tableHeadCheckboxCell = el.querySelector(
+            'sp-table-head sp-table-checkbox-cell'
+        ) as TableCheckboxCell;
 
-        await nextFrame();
-        await nextFrame();
+        tableHeadCheckboxCell.checkbox.click();
+
         await elementUpdated(el);
-
-        // What am I testing for?
-        expect(changeSpy.calledWithExactly(el)).to.be.true;
     });
 
     it('validates `value` property to make sure it matches the values in `selected`', async () => {
@@ -409,7 +454,12 @@ describe('Table', () => {
     it('surfaces [selects="single"] selection on Virtualized Table', async () => {
         // TODO fix the args
         const el = await fixture<Table>(
-            virtualizedSingle(virtualizedSingle.args as Properties)
+            virtualizedSingle({
+                ...virtualizedSingle.args,
+                onChange: () => {
+                    return;
+                },
+            } as Properties)
         );
 
         expect(el.selected, "'Row 1 selected").to.deep.equal(['0']);

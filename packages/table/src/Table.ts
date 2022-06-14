@@ -69,6 +69,7 @@ export class Table extends SpectrumElement {
         ): TemplateResult => {
             const value = this.itemValue(item, index);
             const selected = this.selected.includes(value);
+
             return html`
                 <sp-table-row
                     value=${value}
@@ -170,7 +171,6 @@ export class Table extends SpectrumElement {
         this.tableHeadCheckboxCell.indeterminate = false;
     }
 
-    // TO DO: Refactor manageSelects, manageCheckboxes, and manageCheckboxesRefactor
     protected manageSelects(): void {
         const tableHead = this.querySelector('sp-table-head') as TableHead;
         const checkboxes = this.querySelectorAll('sp-table-checkbox-cell');
@@ -179,7 +179,7 @@ export class Table extends SpectrumElement {
             let allSelected = false;
             if (this.isVirtualized) {
                 allSelected =
-                    // Najika this.selected.length > 0 &&
+                    this.selected.length > 0 &&
                     this.selected.length === this.items.length;
             } else {
                 const tableRows = [
@@ -222,11 +222,23 @@ export class Table extends SpectrumElement {
         }
     }
 
-    // we are going to tend the checkboxes (add if they're there, take away if not needed)
-    // make sure the head checkbox is appropriately handled
-    // mark the checkboxes selected as needed
+    protected manageSelected(): void {
+        this.selectedSet = new Set(this.selected);
 
-    // draws checkboxes on first paint
+        if (!this.isVirtualized) {
+            const rows = [
+                ...this.querySelectorAll('sp-table-row'),
+            ] as TableRow[];
+
+            rows.forEach((row) => {
+                row.selected = this.selectedSet.has(row.value);
+            });
+            if (this.tableHeadCheckboxCell)
+                this.tableHeadCheckboxCell.checked =
+                    this.selected.length === rows.length;
+        }
+    }
+
     protected manageCheckboxes(): void {
         const tableRows = [
             ...this.querySelectorAll('sp-table-row'),
@@ -390,21 +402,7 @@ export class Table extends SpectrumElement {
         }
 
         if (changed.has('selected') && this.hasUpdated) {
-            // Najika this.manageSelected();
-            this.selectedSet = new Set(this.selected);
-
-            if (!this.isVirtualized) {
-                const rows = [
-                    ...this.querySelectorAll('sp-table-row'),
-                ] as TableRow[];
-
-                rows.forEach((row) => {
-                    row.selected = this.selectedSet.has(row.value);
-                });
-                if (this.tableHeadCheckboxCell)
-                    this.tableHeadCheckboxCell.checked =
-                        this.selected.length === rows.length;
-            }
+            this.manageSelected();
         }
     }
 
@@ -425,6 +423,7 @@ export class Table extends SpectrumElement {
             this.tableBody.addEventListener(
                 'rangeChanged',
                 (event: RangeChangedEvent) => {
+                    // console.log('rangeChanged');
                     this.dispatchEvent(
                         new RangeChangedEvent({
                             first: event.first,
@@ -446,7 +445,9 @@ export class Table extends SpectrumElement {
             };
         } = {
             items: this.items,
-            renderItem: this.renderItem,
+            renderItem: (item, index) => {
+                return this.renderItem(item, index);
+            },
             scroller: true,
         };
         if (index) {
