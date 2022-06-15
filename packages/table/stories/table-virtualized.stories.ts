@@ -142,19 +142,13 @@ class VirtualTable extends SpectrumElement {
                 style="height: 200px"
                 size="m"
                 @sorted=${(event: CustomEvent<SortedEventDetails>): void => {
-                    // const { sortby, sorted } = event.target; // sources the target, doesn't work across shadow boundaries
                     const { sortBy, sorted } = event.detail; // leveraged CustomEvent().detail, works across shadow boundaries
-                    // const { sortby, sorted } = event; // class extension of of the Event constructor
-
                     const items = [...this.items];
                     // depending on the column, sort asc or desc depending on the arrow direction
                     items.sort(
                         this.sortItems(sortBy as 'name' | 'date', sorted)
                     );
                     this.items = items;
-
-                    // const items = [...this.items];
-                    // this.items = items.reverse();
                 }}
             >
                 <sp-table-head>
