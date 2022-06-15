@@ -44,10 +44,8 @@ To ensure that the table scrolls, make sure to add a `style` attribute to `<sp-t
 ```html
 <sp-table size="m" style="height: 120px">
     <sp-table-head>
-        <sp-table-head-cell sortable sorted="desc">
-            Column Title
-        </sp-table-head-cell>
-        <sp-table-head-cell sortable>Column Title</sp-table-head-cell>
+        <sp-table-head-cell>Column Title</sp-table-head-cell>
+        <sp-table-head-cell>Column Title</sp-table-head-cell>
         <sp-table-head-cell>Column Title</sp-table-head-cell>
     </sp-table-head>
     <sp-table-body>
@@ -80,84 +78,103 @@ To ensure that the table scrolls, make sure to add a `style` attribute to `<sp-t
 </sp-table>
 ```
 
+## Sorting
+
+For each table column you want to sort, use the `sortable` attribute in its respective `<sp-table-head-cell>`. You can also sort table items without having the user trigger the sorting by using `sorted="asc"|"desc"` for ascending and descending order, respectively. The `sortby` attribute is an event detail specifying which aspect of a particular item in the table you are choosing to sort by.
+
+```html
+<sp-table size="m" style="height: 120px">
+    <sp-table-head>
+        <sp-table-head-cell sortable sorted="asc">
+            Column Title
+        </sp-table-head-cell>
+        <sp-table-head-cell>Column Title</sp-table-head-cell>
+        <sp-table-head-cell>Column Title</sp-table-head-cell>
+    </sp-table-head>
+    <sp-table-body>
+        <sp-table-row>
+            <sp-table-cell>Row Item Bravo</sp-table-cell>
+            <sp-table-cell>Row Item Bravo</sp-table-cell>
+            <sp-table-cell>Row Item Bravo</sp-table-cell>
+        </sp-table-row>
+        <sp-table-row>
+            <sp-table-cell>Row Item Alpha</sp-table-cell>
+            <sp-table-cell>Row Item Alpha</sp-table-cell>
+            <sp-table-cell>Row Item Alpha</sp-table-cell>
+        </sp-table-row>
+        <sp-table-row>
+            <sp-table-cell>Row Item Charlie</sp-table-cell>
+            <sp-table-cell>Row Item Charlie</sp-table-cell>
+            <sp-table-cell>Row Item Charlie</sp-table-cell>
+        </sp-table-row>
+        <sp-table-row>
+            <sp-table-cell>Row Item Delta</sp-table-cell>
+            <sp-table-cell>Row Item Delta</sp-table-cell>
+            <sp-table-cell>Row Item Delta</sp-table-cell>
+        </sp-table-row>
+        <sp-table-row>
+            <sp-table-cell>Row Item Echo</sp-table-cell>
+            <sp-table-cell>Row Item Echo</sp-table-cell>
+            <sp-table-cell>Row Item Echo</sp-table-cell>
+        </sp-table-row>
+    </sp-table-body>
+</sp-table>
+```
+
 ## Selection
 
 To manage selection on an `<sp-table>`, utilise the `selects` attribute on `<sp-table>`. Each `<sp-table-row>` has a `value` attribute which, by default, corresponds to its index in the table, and these `value`s tell `<sp-table>` which `<sp-table-row>`s are selected. The selected items can be manually fed in through the `.selected` attribute on the table.
 
-### `selects="single"`
-
 ```html
-    <sp-table
-        size="m"
-        selects="single"
-        .selected=${['row1']}
-        style="height: 120px"
-        @change=${({ target }: Event & { target: Table }) => {
-            const next = target.nextElementSibling as HTMLDivElement;
-            next.textContent = `Selected: ${JSON.stringify(
-                target.selected
-            )}`;
-        }}
-    >
-        <sp-table-head>
-            <sp-table-head-cell sortable sorted="desc">
-                Column Title
-            </sp-table-head-cell>
-            <sp-table-head-cell sortable>Column Title</sp-table-head-cell>
-            <sp-table-head-cell>Column Title</sp-table-head-cell>
-        </sp-table-head>
-        <sp-table-body>
-            <sp-table-row value="row1">
-                <sp-table-cell>Row Item Alpha</sp-table-cell>
-                <sp-table-cell>Row Item Alpha</sp-table-cell>
-                <sp-table-cell>Row Item Alpha</sp-table-cell>
-            </sp-table-row>
-            <sp-table-row value="row2">
-                <sp-table-cell>Row Item Bravo</sp-table-cell>
-                <sp-table-cell>Row Item Bravo</sp-table-cell>
-                <sp-table-cell>Row Item Bravo</sp-table-cell>
-            </sp-table-row>
-            <sp-table-row value="row3">
-                <sp-table-cell>Row Item Charlie</sp-table-cell>
-                <sp-table-cell>Row Item Charlie</sp-table-cell>
-                <sp-table-cell>Row Item Charlie</sp-table-cell>
-            </sp-table-row>
-            <sp-table-row value="row4">
-                <sp-table-cell>Row Item Delta</sp-table-cell>
-                <sp-table-cell>Row Item Delta</sp-table-cell>
-                <sp-table-cell>Row Item Delta</sp-table-cell>
-            </sp-table-row>
-            <sp-table-row value="row5">
-                <sp-table-cell>Row Item Echo</sp-table-cell>
-                <sp-table-cell>Row Item Echo</sp-table-cell>
-                <sp-table-cell>Row Item Echo</sp-table-cell>
-            </sp-table-row>
-        </sp-table-body>
-    </sp-table>
-    <div>Selected: ["row1"]</div>
+<sp-table size="m" style="height: 120px">
+    <sp-table-head>
+        <sp-table-head-cell sortable sort>Column Title</sp-table-head-cell>
+        <sp-table-head-cell>Column Title</sp-table-head-cell>
+        <sp-table-head-cell>Column Title</sp-table-head-cell>
+    </sp-table-head>
+    <sp-table-body>
+        <sp-table-row>
+            <sp-table-cell>Row Item Alpha</sp-table-cell>
+            <sp-table-cell>Row Item Alpha</sp-table-cell>
+            <sp-table-cell>Row Item Alpha</sp-table-cell>
+        </sp-table-row>
+        <sp-table-row>
+            <sp-table-cell>Row Item Bravo</sp-table-cell>
+            <sp-table-cell>Row Item Bravo</sp-table-cell>
+            <sp-table-cell>Row Item Bravo</sp-table-cell>
+        </sp-table-row>
+        <sp-table-row>
+            <sp-table-cell>Row Item Charlie</sp-table-cell>
+            <sp-table-cell>Row Item Charlie</sp-table-cell>
+            <sp-table-cell>Row Item Charlie</sp-table-cell>
+        </sp-table-row>
+        <sp-table-row>
+            <sp-table-cell>Row Item Delta</sp-table-cell>
+            <sp-table-cell>Row Item Delta</sp-table-cell>
+            <sp-table-cell>Row Item Delta</sp-table-cell>
+        </sp-table-row>
+        <sp-table-row>
+            <sp-table-cell>Row Item Echo</sp-table-cell>
+            <sp-table-cell>Row Item Echo</sp-table-cell>
+            <sp-table-cell>Row Item Echo</sp-table-cell>
+        </sp-table-row>
+    </sp-table-body>
+</sp-table>
 ```
 
-### `selects="multiple"`
-
-When `selects` is set to "multiple", the `<sp-table-checkbox-cell>` in `<sp-table-head>` acts as the select/deselect all button.
+### `selects="single"`
 
 ```html
 <sp-table
     size="m"
+    selects="single"
+    selected='["row1"]'
     style="height: 120px"
-    .selected=${['row1', 'row2']}
-    @change=${({ target }: Event & { target: Table }) => {
-        const next = target.nextElementSibling as HTMLDivElement;
-        next.textContent = `Selected: ${JSON.stringify(
-            target.selected
-        )}`;
-    }}
+    onchange="spAlert(`Selected: ${JSON.stringify(this.selected)`)"
 >
     <sp-table-head>
-        <sp-table-head-cell sortable sorted="desc">
-            Column Title
-        </sp-table-head-cell>
-        <sp-table-head-cell sortable>Column Title</sp-table-head-cell>
+        <sp-table-head-cell>Column Title</sp-table-head-cell>
+        <sp-table-head-cell>Column Title</sp-table-head-cell>
         <sp-table-head-cell>Column Title</sp-table-head-cell>
     </sp-table-head>
     <sp-table-body>
@@ -188,7 +205,53 @@ When `selects` is set to "multiple", the `<sp-table-checkbox-cell>` in `<sp-tabl
         </sp-table-row>
     </sp-table-body>
 </sp-table>
-<div>Selected: ["row1", "row2"]</div>
+```
+
+### `selects="multiple"`
+
+When `selects` is set to "multiple", the `<sp-table-checkbox-cell>` in `<sp-table-head>` acts as the select/deselect all button.
+
+```html
+<sp-table
+    size="m"
+    style="height: 120px"
+    selects="multiple"
+    selected='["row1", "row2"]'
+    onchange="spAlert(`Selected: ${JSON.stringify(this.selected)`)"
+>
+    <sp-table-head>
+        <sp-table-head-cell>Column Title</sp-table-head-cell>
+        <sp-table-head-cell>Column Title</sp-table-head-cell>
+        <sp-table-head-cell>Column Title</sp-table-head-cell>
+    </sp-table-head>
+    <sp-table-body>
+        <sp-table-row value="row1">
+            <sp-table-cell>Row Item Alpha</sp-table-cell>
+            <sp-table-cell>Row Item Alpha</sp-table-cell>
+            <sp-table-cell>Row Item Alpha</sp-table-cell>
+        </sp-table-row>
+        <sp-table-row value="row2">
+            <sp-table-cell>Row Item Bravo</sp-table-cell>
+            <sp-table-cell>Row Item Bravo</sp-table-cell>
+            <sp-table-cell>Row Item Bravo</sp-table-cell>
+        </sp-table-row>
+        <sp-table-row value="row3">
+            <sp-table-cell>Row Item Charlie</sp-table-cell>
+            <sp-table-cell>Row Item Charlie</sp-table-cell>
+            <sp-table-cell>Row Item Charlie</sp-table-cell>
+        </sp-table-row>
+        <sp-table-row value="row4">
+            <sp-table-cell>Row Item Delta</sp-table-cell>
+            <sp-table-cell>Row Item Delta</sp-table-cell>
+            <sp-table-cell>Row Item Delta</sp-table-cell>
+        </sp-table-row>
+        <sp-table-row value="row5">
+            <sp-table-cell>Row Item Echo</sp-table-cell>
+            <sp-table-cell>Row Item Echo</sp-table-cell>
+            <sp-table-cell>Row Item Echo</sp-table-cell>
+        </sp-table-row>
+    </sp-table-body>
+</sp-table>
 ```
 
 ## Virtualized Table
@@ -196,38 +259,27 @@ When `selects` is set to "multiple", the `<sp-table-checkbox-cell>` in `<sp-tabl
 For large amounts of data, the `<sp-table>` can be virtualised to easily add table rows by using properties.
 
 ```html
-    <sp-table
-        size="m"
-        selects="multiple"
-        @change=${({ target }: Event & { target: Table }) => {
-            const next = target.nextElementSibling as HTMLDivElement;
-            next.textContent = `Selected: ${JSON.stringify(
-                target.selected,
-                null,
-                ' '
-            )}`;
-            const nextNext = next.nextElementSibling as HTMLDivElement;
-            nextNext.textContent = `Selected Count: ${target.selected.length}`;
-        }}
-        style="height: 200px"
-        .items=${[{'key': 'value'}]}
-        .renderItem=${(item: Item, index: number): TemplateResult => {
-        return html`
-            <sp-table-cell>Rowsaa Item Alpha ${item}</sp-table-cell>
-            <sp-table-cell>Row Item Alpha ${index}</sp-table-cell>
-        `;
-    };}
-    >
-        <sp-table-head>
-            <sp-table-head-cell sortable sortby="name" sorted="desc">
-                Column Title
-            </sp-table-head-cell>
-            <sp-table-head-cell sortable sortby="date">
-                Column Title
-            </sp-table-head-cell>
-            <sp-table-head-cell>Column Title</sp-table-head-cell>
-        </sp-table-head>
-    </sp-table>
+<sp-table
+    size="m"
+    items='[{"key1": "value1"}, {"key2": "value2"}, {"key3": "value3"}]'
+    renderItem='
+        const items = [{"key1": "value1"}, {"key2": "value2"}, {"key3": "value3"}];
+        const table = this.nextElementSibling;
+        function renderItems(item, index) {
+            return `
+                <sp-table-cell>Row Item Alpha ${item}</sp-table-cell>
+                <sp-table-cell>Row Item Alpha ${index}</sp-table-cell>
+                `;
+            }
+        items.forEach((item, index) => { renderItems(item, index); }
+        '
+>
+    <sp-table-head>
+        <sp-table-head-cell>Column Title</sp-table-head-cell>
+        <sp-table-head-cell>Column Title</sp-table-head-cell>
+        <sp-table-head-cell>Column Title</sp-table-head-cell>
+    </sp-table-head>
+</sp-table>
 ```
 
 ### How to use it
@@ -250,9 +302,9 @@ Please note that there is a bug when attempting to select all virtualised elemen
 
 ## TO-DO:
 
--   [ ] Scrolling w/ screenreader on virtualised table elements
+Scrolling w/ screenreader on virtualised table elements
 
--   NOT CURRENTLY NEEDED but still important
+NOT CURRENTLY NEEDED but still important:
 
 1. multiselects via attributes (not required for Express delivery)
 2. Update checkbox element to dispatch event correctly
