@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.9](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/icon@0.11.8...@spectrum-web-components/icon@0.11.9) (2022-06-07)
+
+**Note:** Version bump only for package @spectrum-web-components/icon
+
+## [0.11.8](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/icon@0.11.7...@spectrum-web-components/icon@0.11.8) (2022-05-27)
+
+### Bug Fixes
+
+-   update consumption of Spectrum CSS for latest version ([ed2305b](https://github.com/adobe/spectrum-web-components/commit/ed2305b7334c973ea5c8299cbbce33a365896329))
+
+## [0.11.7](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/icon@0.11.6...@spectrum-web-components/icon@0.11.7) (2022-05-12)
+
+**Note:** Version bump only for package @spectrum-web-components/icon
+
 ## [0.11.6](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/icon@0.11.5...@spectrum-web-components/icon@0.11.6) (2022-04-21)
 
 **Note:** Version bump only for package @spectrum-web-components/icon

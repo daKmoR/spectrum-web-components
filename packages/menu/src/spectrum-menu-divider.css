@@ -12,17 +12,14 @@ governing permissions and limitations under the License.
 
 /* THIS FILE IS MACHINE GENERATED. DO NOT EDIT */
 :host {
-    border: none;
-    box-sizing: content-box; /* .spectrum-Menu-divider */
-    height: var(--spectrum-listitem-texticon-divider-size);
     margin: calc(var(--spectrum-listitem-texticon-divider-padding) / 2)
         var(--spectrum-listitem-texticon-padding-y);
-    overflow: visible;
-    padding: 0;
+    overflow: visible; /* .spectrum-Menu .spectrum-Menu-divider */
+    width: auto;
 }
-:host {
-    background-color: var(
-        --spectrum-listitem-m-texticon-divider-color,
-        var(--spectrum-alias-border-color-extralight)
-    ); /* .spectrum-Menu-divider */
+@media (forced-colors: active) {
+    :host {
+        background-color: CanvasText;
+        forced-color-adjust: none;
+    }
 }

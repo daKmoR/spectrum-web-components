@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.1](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/bundle@0.25.0...@spectrum-web-components/bundle@0.25.1) (2022-06-07)
+
+**Note:** Version bump only for package @spectrum-web-components/bundle
+
+# [0.25.0](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/bundle@0.24.12...@spectrum-web-components/bundle@0.25.0) (2022-05-27)
+
+### Features
+
+-   add badge component ([cabfdfe](https://github.com/adobe/spectrum-web-components/commit/cabfdfe7b7eb00c3868ec26afab524cef1c2fcbd))
+
+## [0.24.12](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/bundle@0.24.11...@spectrum-web-components/bundle@0.24.12) (2022-05-12)
+
+**Note:** Version bump only for package @spectrum-web-components/bundle
+
 ## [0.24.11](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/bundle@0.24.10...@spectrum-web-components/bundle@0.24.11) (2022-04-21)
 
 **Note:** Version bump only for package @spectrum-web-components/bundle

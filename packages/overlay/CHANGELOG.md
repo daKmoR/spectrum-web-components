@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.3](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/overlay@0.16.2...@spectrum-web-components/overlay@0.16.3) (2022-06-07)
+
+### Bug Fixes
+
+-   prevent leaving multiple submenus open at a time ([d2bfbb2](https://github.com/adobe/spectrum-web-components/commit/d2bfbb2d8334ae1a6bd21381092d54914b8f708c))
+
+## [0.16.2](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/overlay@0.16.1...@spectrum-web-components/overlay@0.16.2) (2022-05-27)
+
+### Bug Fixes
+
+-   add content flow fallbacks to the position manager ([c008957](https://github.com/adobe/spectrum-web-components/commit/c0089571be599577f75b2fe7929b8ee26529358d))
+-   prevent "hover" overlays from receiving focus ([7bd5ac2](https://github.com/adobe/spectrum-web-components/commit/7bd5ac26589f4248bdcde1ee3a168052b5a7bf20))
+
+## [0.16.1](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/overlay@0.16.0...@spectrum-web-components/overlay@0.16.1) (2022-05-12)
+
+**Note:** Version bump only for package @spectrum-web-components/overlay
+
 # [0.16.0](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/overlay@0.15.3...@spectrum-web-components/overlay@0.16.0) (2022-04-21)
 
 ### Bug Fixes

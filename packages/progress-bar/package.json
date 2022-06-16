@@ -1,6 +1,6 @@
 {
     "name": "@spectrum-web-components/progress-bar",
-    "version": "0.5.8",
+    "version": "0.5.11",
     "publishConfig": {
         "access": "public"
     },
@@ -44,12 +44,12 @@
         "lit-html"
     ],
     "dependencies": {
-        "@spectrum-web-components/base": "^0.5.5",
-        "@spectrum-web-components/field-label": "^0.7.8",
+        "@spectrum-web-components/base": "^0.5.7",
+        "@spectrum-web-components/field-label": "^0.7.11",
         "tslib": "^2.0.0"
     },
     "devDependencies": {
-        "@spectrum-css/progressbar": "^1.0.25"
+        "@spectrum-css/progressbar": "^1.0.28"
     },
     "types": "./src/index.d.ts",
     "customElements": "custom-elements.json",

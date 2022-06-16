@@ -27,6 +27,7 @@ import type {
     ThemeVariant,
 } from '@spectrum-web-components/theme/src/Theme.js';
 import styles from './active-overlay.css.js';
+import { parentOverlayOf } from './overlay-utils.js';
 import {
     OverlayOpenCloseDetail,
     OverlayOpenDetail,
@@ -38,6 +39,7 @@ import {
     arrow,
     computePosition,
     flip,
+    Placement as FloatingUIPlacement,
     offset,
     shift,
     size,
@@ -104,16 +106,24 @@ const stateTransition = (
     return stateMachine.states[state].on[event] || state;
 };
 
-const parentOverlayOf = (el: Element): ActiveOverlay | null => {
-    const closestOverlay = el.closest('active-overlay');
-    if (closestOverlay) {
-        return closestOverlay;
-    }
-    const rootNode = el.getRootNode() as ShadowRoot;
-    if (rootNode.host) {
-        return parentOverlayOf(rootNode.host);
-    }
-    return null;
+const getFallbackPlacements = (
+    placement: FloatingUIPlacement
+): FloatingUIPlacement[] => {
+    const fallbacks: Record<FloatingUIPlacement, FloatingUIPlacement[]> = {
+        left: ['right', 'bottom', 'top'],
+        'left-start': ['right-start', 'bottom', 'top'],
+        'left-end': ['right-end', 'bottom', 'top'],
+        right: ['left', 'bottom', 'top'],
+        'right-start': ['left-start', 'bottom', 'top'],
+        'right-end': ['left-end', 'bottom', 'top'],
+        top: ['bottom', 'left', 'right'],
+        'top-start': ['bottom-start', 'left', 'right'],
+        'top-end': ['bottom-end', 'left', 'right'],
+        bottom: ['top', 'left', 'right'],
+        'bottom-start': ['top-start', 'left', 'right'],
+        'bottom-end': ['top-end', 'left', 'right'],
+    };
+    return fallbacks[placement] ?? [placement];
 };
 
 /**
@@ -125,6 +135,7 @@ export class ActiveOverlay extends SpectrumElement {
     public overlayContent!: HTMLElement;
     public overlayContentTip?: HTMLElement;
     public trigger!: HTMLElement;
+    public root?: HTMLElement;
     public virtualTrigger?: VirtualTrigger;
 
     protected childrenReady!: Promise<unknown[]>;
@@ -166,7 +177,7 @@ export class ActiveOverlay extends SpectrumElement {
     private originalPlacement?: Placement;
     private restoreContent?: () => Element[];
 
-    public async focus(): Promise<void> {
+    public override async focus(): Promise<void> {
         const firstFocusable = firstFocusableIn(this);
         if (firstFocusable) {
             if ((firstFocusable as SpectrumElement).updateComplete) {
@@ -195,7 +206,7 @@ export class ActiveOverlay extends SpectrumElement {
 
     private timeout?: number;
 
-    public static get styles(): CSSResultArray {
+    public static override get styles(): CSSResultArray {
         return [styles];
     }
 
@@ -253,7 +264,7 @@ export class ActiveOverlay extends SpectrumElement {
         return undefined;
     }
 
-    public async firstUpdated(
+    public override async firstUpdated(
         changedProperties: PropertyValues
     ): Promise<void> {
         super.firstUpdated(changedProperties);
@@ -332,6 +343,7 @@ export class ActiveOverlay extends SpectrumElement {
         this.interaction = detail.interaction;
         this.theme = detail.theme;
         this.receivesFocus = detail.receivesFocus;
+        this.root = detail.root;
     }
 
     public dispose(): void {
@@ -412,26 +424,38 @@ export class ActiveOverlay extends SpectrumElement {
         // See: https://github.com/adobe/spectrum-web-components/issues/910
         const MIN_OVERLAY_HEIGHT = 100;
 
+        const flipMiddleware = this.virtualTrigger
+            ? flip({
+                  padding: REQUIRED_DISTANCE_TO_EDGE,
+                  fallbackPlacements: getFallbackPlacements(this.placement),
+              })
+            : flip({
+                  padding: REQUIRED_DISTANCE_TO_EDGE,
+              });
+
         const middleware = [
             offset({
                 mainAxis: this.offset,
                 crossAxis: this.skidding,
             }),
-            flip({
-                fallbackStrategy: 'initialPlacement',
-            }),
             shift({ padding: REQUIRED_DISTANCE_TO_EDGE }),
+            flipMiddleware,
             size({
                 padding: REQUIRED_DISTANCE_TO_EDGE,
-                apply: ({ width, height, floating }) => {
+                apply: ({
+                    availableWidth,
+                    availableHeight,
+                    rects: { floating },
+                }) => {
                     const maxHeight = Math.max(
                         MIN_OVERLAY_HEIGHT,
-                        Math.floor(height)
+                        Math.floor(availableHeight)
                     );
                     const actualHeight = floating.height;
-                    this.initialHeight = !this.isConstrained
-                        ? actualHeight
-                        : this.initialHeight || actualHeight;
+                    this.initialHeight =
+                        !this.isConstrained && !this.virtualTrigger
+                            ? actualHeight
+                            : this.initialHeight || actualHeight;
                     this.isConstrained =
                         actualHeight < this.initialHeight ||
                         maxHeight <= actualHeight;
@@ -439,7 +463,7 @@ export class ActiveOverlay extends SpectrumElement {
                         ? `${maxHeight}px`
                         : '';
                     Object.assign(this.style, {
-                        maxWidth: `${Math.floor(width)}px`,
+                        maxWidth: `${Math.floor(availableWidth)}px`,
                         maxHeight: appliedHeight,
                         height: appliedHeight,
                     });
@@ -556,7 +580,7 @@ export class ActiveOverlay extends SpectrumElement {
         `;
     }
 
-    public render(): TemplateResult {
+    public override render(): TemplateResult {
         const content = html`
             <div id="contents">
                 <slot @slotchange=${this.onSlotChange}></slot>
@@ -578,7 +602,7 @@ export class ActiveOverlay extends SpectrumElement {
     private stealOverlayContentPromise = Promise.resolve();
     private stealOverlayContentResolver!: () => void;
 
-    protected async getUpdateComplete(): Promise<boolean> {
+    protected override async getUpdateComplete(): Promise<boolean> {
         const actions: Promise<unknown>[] = [
             super.getUpdateComplete(),
             this.stealOverlayContentPromise,
@@ -590,7 +614,7 @@ export class ActiveOverlay extends SpectrumElement {
         return complete as boolean;
     }
 
-    disconnectedCallback(): void {
+    override disconnectedCallback(): void {
         document.removeEventListener(
             'sp-update-overlays',
             this.updateOverlayPosition

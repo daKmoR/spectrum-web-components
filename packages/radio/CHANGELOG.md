@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.12](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/radio@0.9.11...@spectrum-web-components/radio@0.9.12) (2022-06-07)
+
+**Note:** Version bump only for package @spectrum-web-components/radio
+
+## [0.9.11](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/radio@0.9.10...@spectrum-web-components/radio@0.9.11) (2022-05-27)
+
+**Note:** Version bump only for package @spectrum-web-components/radio
+
+## [0.9.10](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/radio@0.9.9...@spectrum-web-components/radio@0.9.10) (2022-05-12)
+
+**Note:** Version bump only for package @spectrum-web-components/radio
+
 ## [0.9.9](https://github.com/adobe/spectrum-web-components/compare/@spectrum-web-components/radio@0.9.8...@spectrum-web-components/radio@0.9.9) (2022-04-21)
 
 ### Bug Fixes

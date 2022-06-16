@@ -34,6 +34,7 @@ import type { NumberField } from '@spectrum-web-components/number-field';
 import { HandleController, HandleValueDictionary } from './HandleController.js';
 import { SliderHandle } from './SliderHandle.js';
 import { streamingListener } from '@spectrum-web-components/base/src/streaming-listener.js';
+import type { NumberFormatter } from '@internationalized/number';
 
 export const variants = ['filled', 'ramp', 'range', 'tick'];
 
@@ -41,13 +42,16 @@ export const variants = ['filled', 'ramp', 'range', 'tick'];
  * @element sp-slider
  *
  * @slot - text label for the Slider
+ * @slot handle - optionally accepts two or more sp-slider-handle elements
  */
 export class Slider extends ObserveSlotText(SliderHandle, '') {
-    public static get styles(): CSSResultArray {
+    public static override get styles(): CSSResultArray {
         return [sliderStyles];
     }
 
-    public handleController: HandleController = new HandleController(this);
+    public override handleController: HandleController = new HandleController(
+        this
+    );
 
     /**
      * Whether to display a Number Field along side the slider UI
@@ -106,7 +110,7 @@ export class Slider extends ObserveSlotText(SliderHandle, '') {
         return this.handleController.values;
     }
 
-    public get handleName(): string {
+    public override get handleName(): string {
         return 'value';
     }
 
@@ -123,7 +127,7 @@ export class Slider extends ObserveSlotText(SliderHandle, '') {
         return valueArray.join(`${this._forcedUnit}, `) + this._forcedUnit;
     };
 
-    public get ariaValueText(): string {
+    public override get ariaValueText(): string {
         if (!this.getAriaValueText) {
             return `${this.value}${this._forcedUnit}`;
         }
@@ -134,13 +138,13 @@ export class Slider extends ObserveSlotText(SliderHandle, '') {
     public labelVisibility?: 'text' | 'value' | 'none';
 
     @property({ type: Number, reflect: true })
-    public min = 0;
+    public override min = 0;
 
     @property({ type: Number, reflect: true })
-    public max = 100;
+    public override max = 100;
 
     @property({ type: Number })
-    public step = 1;
+    public override step = 1;
 
     @property({ type: Number, attribute: 'tick-step' })
     public tickStep = 0;
@@ -149,7 +153,7 @@ export class Slider extends ObserveSlotText(SliderHandle, '') {
     public tickLabels = false;
 
     @property({ type: Boolean, reflect: true })
-    public disabled = false;
+    public override disabled = false;
 
     @query('#label')
     public labelEl!: HTMLLabelElement;
@@ -160,11 +164,11 @@ export class Slider extends ObserveSlotText(SliderHandle, '') {
     @query('#track')
     public track!: HTMLDivElement;
 
-    public get numberFormat(): Intl.NumberFormat {
+    public override get numberFormat(): NumberFormatter {
         return this.getNumberFormat();
     }
 
-    public get focusElement(): HTMLElement {
+    public override get focusElement(): HTMLElement {
         return this.handleController.focusElement;
     }
 
@@ -175,7 +179,7 @@ export class Slider extends ObserveSlotText(SliderHandle, '') {
         }
     }
 
-    protected render(): TemplateResult {
+    protected override render(): TemplateResult {
         return html`
             ${this.renderLabel()} ${this.renderTrack()}
             ${this.editable
@@ -197,18 +201,21 @@ export class Slider extends ObserveSlotText(SliderHandle, '') {
         `;
     }
 
-    public connectedCallback(): void {
+    public override connectedCallback(): void {
         super.connectedCallback();
         this.handleController.hostConnected();
     }
 
-    public disconnectedCallback(): void {
+    public override disconnectedCallback(): void {
         super.disconnectedCallback();
         this.handleController.hostDisconnected();
     }
 
-    public update(changedProperties: Map<string, boolean>): void {
+    public override update(changedProperties: Map<string, boolean>): void {
         this.handleController.hostUpdate();
+        if (changedProperties.has('disabled') && this.disabled) {
+            this.handleController.cancelDrag();
+        }
         super.update(changedProperties);
     }
 
@@ -292,7 +299,7 @@ export class Slider extends ObserveSlotText(SliderHandle, '') {
                             ${this.tickLabels
                                 ? html`
                                       <div class="tickLabel">
-                                          ${i * tickStep}
+                                          ${i * tickStep + this.min}
                                       </div>
                                   `
                                 : html``}
@@ -400,7 +407,7 @@ export class Slider extends ObserveSlotText(SliderHandle, '') {
 
     private _numberFieldInput: Promise<unknown> = Promise.resolve();
 
-    protected async getUpdateComplete(): Promise<boolean> {
+    protected override async getUpdateComplete(): Promise<boolean> {
         const complete = (await super.getUpdateComplete()) as boolean;
         if (this.editable) {
             await this._numberFieldInput;

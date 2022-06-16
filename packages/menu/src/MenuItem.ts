@@ -107,7 +107,7 @@ const removeEvent = new MenuItemRemovedEvent();
  * @fires sp-menu-item-removed - announces when removed from the DOM so the parent menu can remove ownership and update selected state
  */
 export class MenuItem extends LikeAnchor(Focusable) {
-    public static get styles(): CSSResultArray {
+    public static override get styles(): CSSResultArray {
         return [menuItemStyles, checkmarkStyles, chevronStyles];
     }
 
@@ -169,7 +169,7 @@ export class MenuItem extends LikeAnchor(Focusable) {
     @query('.anchor')
     private anchorElement!: HTMLAnchorElement;
 
-    public get focusElement(): HTMLElement {
+    public override get focusElement(): HTMLElement {
         return this;
     }
 
@@ -214,7 +214,7 @@ export class MenuItem extends LikeAnchor(Focusable) {
     @property({ type: Boolean })
     public open = false;
 
-    public click(): void {
+    public override click(): void {
         if (this.disabled) {
             return;
         }
@@ -253,7 +253,7 @@ export class MenuItem extends LikeAnchor(Focusable) {
         this.triggerUpdate();
     }
 
-    protected render(): TemplateResult {
+    protected override render(): TemplateResult {
         return html`
             <slot name="icon" @slotchange=${this.breakItemChildrenCache}></slot>
             <div id="label">
@@ -315,7 +315,7 @@ export class MenuItem extends LikeAnchor(Focusable) {
         this.active = true;
     }
 
-    protected firstUpdated(changes: PropertyValues): void {
+    protected override firstUpdated(changes: PropertyValues): void {
         super.firstUpdated(changes);
         this.setAttribute('tabindex', '-1');
         this.addEventListener('pointerdown', this.handlePointerdown);
@@ -327,7 +327,7 @@ export class MenuItem extends LikeAnchor(Focusable) {
     public closeOverlay?: (leave?: boolean) => Promise<void>;
 
     protected handleSubmenuClick(): void {
-        this.openOverlay({ immediate: true });
+        this.openOverlay();
     }
 
     protected handlePointerenter(): void {
@@ -368,10 +368,8 @@ export class MenuItem extends LikeAnchor(Focusable) {
         }
     };
 
-    public async openOverlay({
-        immediate,
-    }: { immediate?: boolean } = {}): Promise<void> {
-        if (!this.hasSubmenu || this.open) {
+    public async openOverlay(): Promise<void> {
+        if (!this.hasSubmenu || this.open || this.disabled) {
             return;
         }
         this.open = true;
@@ -393,60 +391,34 @@ export class MenuItem extends LikeAnchor(Focusable) {
                 const slotName = el.slot;
                 el.tabIndex = 0;
                 el.removeAttribute('slot');
+                el.isSubmenu = true;
                 return (el) => {
                     el.tabIndex = -1;
                     el.slot = slotName;
+                    el.isSubmenu = false;
                 };
             },
         });
         const closeOverlay = openOverlay(this, 'click', popover, {
             placement: this.isLTR ? 'right-start' : 'left-start',
             receivesFocus: 'auto',
-            delayed: !immediate && false,
+            root: this.menuData.focusRoot,
         });
-        let closing = false;
-        const closeSubmenu = async (leave = false): Promise<void> => {
+        const closeSubmenu = async (): Promise<void> => {
             delete this.closeOverlay;
-            if (submenu.hasOpenSubmenu) {
-                await submenu.closeOpenSubmenu(leave);
-            }
-            if (!leave) {
-                closing = true;
-            }
-            this.menuData.focusRoot?.submenuWillCloseOn(this);
             (await closeOverlay)();
         };
         this.closeOverlay = closeSubmenu;
-        if (this.menuData.focusRoot?.hasOpenSubmenu) {
-            this.menuData.focusRoot.closeOpenSubmenu(true);
-        }
-        const setup = (): void => {
-            submenu.setCloseSelfAsSubmenu(closeSubmenu);
-            this.menuData.focusRoot?.setCloseOpenSubmenu(closeSubmenu);
-        };
         const cleanup = (event: CustomEvent<OverlayOpenCloseDetail>): void => {
             event.stopPropagation();
             returnSubmenu();
-            submenu.setCloseSelfAsSubmenu(closeSubmenu);
-            this.menuData.focusRoot?.setCloseOpenSubmenu(closeSubmenu);
             this.open = false;
             this.active = false;
-            if (closing || event.detail.reason === 'external-click') {
-                this.menuData.focusRoot?.dispatchEvent(
-                    new CustomEvent('close', {
-                        bubbles: true,
-                        composed: true,
-                        detail: { reason: 'external-click' },
-                    })
-                );
-            }
         };
-        this.addEventListener('sp-opened', setup as EventListener, {
-            once: true,
-        });
         this.addEventListener('sp-closed', cleanup as EventListener, {
             once: true,
         });
+        popover.addEventListener('change', closeSubmenu);
     }
 
     updateAriaSelected(): void {
@@ -466,7 +438,7 @@ export class MenuItem extends LikeAnchor(Focusable) {
         this.updateAriaSelected();
     }
 
-    protected updated(changes: PropertyValues<this>): void {
+    protected override updated(changes: PropertyValues<this>): void {
         super.updated(changes);
         if (changes.has('label')) {
             this.setAttribute('aria-label', this.label || '');
@@ -509,7 +481,7 @@ export class MenuItem extends LikeAnchor(Focusable) {
         }
     }
 
-    public connectedCallback(): void {
+    public override connectedCallback(): void {
         super.connectedCallback();
         this.isInSubmenu = !!this.closest('[slot="submenu"]');
         if (this.isInSubmenu) {
@@ -522,7 +494,7 @@ export class MenuItem extends LikeAnchor(Focusable) {
 
     _parentElement!: HTMLElement;
 
-    public disconnectedCallback(): void {
+    public override disconnectedCallback(): void {
         removeEvent.reset(this);
         if (!this.isInSubmenu) {
             this._parentElement?.dispatchEvent(removeEvent);

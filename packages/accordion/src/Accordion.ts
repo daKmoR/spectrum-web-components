@@ -20,7 +20,7 @@ import {
     property,
     queryAssignedNodes,
 } from '@spectrum-web-components/base/src/decorators.js';
-import { RovingTabindexController } from '@spectrum-web-components/reactive-controllers/src/RovingTabindex.js';
+import { FocusGroupController } from '@spectrum-web-components/reactive-controllers/src/FocusGroup.js';
 
 import { AccordionItem } from './AccordionItem.js';
 
@@ -31,7 +31,7 @@ import styles from './accordion.css.js';
  * @slot - The sp-accordion-item children to display.
  */
 export class Accordion extends SpectrumElement {
-    public static get styles(): CSSResultArray {
+    public static override get styles(): CSSResultArray {
         return [styles];
     }
 
@@ -50,22 +50,14 @@ export class Accordion extends SpectrumElement {
         ) as AccordionItem[];
     }
 
-    rovingTabindexController = new RovingTabindexController<AccordionItem>(
-        this,
-        {
-            focusInIndex: (elements: AccordionItem[]) => {
-                return elements.findIndex((el) => {
-                    return !el.disabled;
-                });
-            },
-            direction: 'vertical',
-            elements: () => this.items,
-            isFocusableElement: (el: AccordionItem) => !el.disabled,
-        }
-    );
+    focusGroupController = new FocusGroupController<AccordionItem>(this, {
+        direction: 'vertical',
+        elements: () => this.items,
+        isFocusableElement: (el: AccordionItem) => !el.disabled,
+    });
 
-    public focus(): void {
-        this.rovingTabindexController.focus();
+    public override focus(): void {
+        this.focusGroupController.focus();
     }
 
     private async onToggle(event: Event): Promise<void> {
@@ -92,14 +84,14 @@ export class Accordion extends SpectrumElement {
     }
 
     private handleSlotchange(): void {
-        this.rovingTabindexController.clearElementCache();
+        this.focusGroupController.clearElementCache();
     }
 
-    protected render(): TemplateResult {
+    protected override render(): TemplateResult {
         return html`
             <slot
-                @sp-accordion-item-toggle=${this.onToggle}
                 @slotchange=${this.handleSlotchange}
+                @sp-accordion-item-toggle=${this.onToggle}
             ></slot>
         `;
     }

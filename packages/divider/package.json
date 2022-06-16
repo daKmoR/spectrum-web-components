@@ -1,6 +1,6 @@
 {
     "name": "@spectrum-web-components/divider",
-    "version": "0.4.6",
+    "version": "0.4.9",
     "publishConfig": {
         "access": "public"
     },
@@ -44,11 +44,11 @@
         "lit-html"
     ],
     "dependencies": {
-        "@spectrum-web-components/base": "^0.5.5",
+        "@spectrum-web-components/base": "^0.5.7",
         "tslib": "^2.0.0"
     },
     "devDependencies": {
-        "@spectrum-css/divider": "^1.0.23"
+        "@spectrum-css/divider": "^1.0.25"
     },
     "types": "./src/index.d.ts",
     "customElements": "custom-elements.json",

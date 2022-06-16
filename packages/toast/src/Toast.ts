@@ -51,13 +51,24 @@ export type ToastVariants =
  */
 
 export class Toast extends SpectrumElement {
-    public static get styles(): CSSResultArray {
+    public static override get styles(): CSSResultArray {
         return [toastStyles];
     }
 
     @property({ type: Boolean, reflect: true })
     public open = false;
 
+    /**
+     * When a timeout is provided it represents the number of milliseconds from when
+     * the Toast was placed on the page before it will automatically dismiss itself.
+     * Accessibility concerns require that a Toast is available for at least 6000ms
+     * before being dismissed, so any timeout of less than 6000ms will be raised to
+     * that baseline. It is suggested that messages longer than 120 words should
+     * receive another 1000ms in their timeout for each additional 120 words in the
+     * message. E.G. 240 words = 7000ms, 360 words = 8000ms, etc.
+     *
+     * @param {Number} timeout
+     */
     @property({ type: Number })
     public set timeout(timeout: number | null) {
         const hasTimeout = typeof timeout !== null && (timeout as number) > 0;
@@ -191,7 +202,7 @@ export class Toast extends SpectrumElement {
         this.open = false;
     }
 
-    protected render(): TemplateResult {
+    protected override render(): TemplateResult {
         return html`
             ${this.renderIcon(this.variant)}
             <div class="body" role="alert">
@@ -210,7 +221,7 @@ export class Toast extends SpectrumElement {
         `;
     }
 
-    protected updated(changes: PropertyValues): void {
+    protected override updated(changes: PropertyValues): void {
         super.updated(changes);
         if (changes.has('open')) {
             if (this.open) {

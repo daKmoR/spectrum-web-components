@@ -1,11 +1,12 @@
 {
   "name": "example-project-rollup",
-  "version": "0.5.12",
+  "version": "0.5.15",
   "private": true,
   "description": "An example project that uses the web components and gives an example of how to bundle them minimally with rollup.",
   "license": "Apache-2.0",
   "author": "example-app",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "build": "rimraf dist && yarn build:tsc && rollup -c rollup.config.js",
     "build:tsc": "tsc && cp src/styles.css out-tsc/src",
@@ -15,16 +16,16 @@
     "lint:eslint": "eslint --ext .ts,.html . --ignore-path .gitignore",
     "lint:prettier": "prettier \"**/*.js\" \"**/*.ts\" --check --ignore-path .gitignore",
     "postbuild": "mv dist/*.css dist/styles.css",
-    "start": "concurrently --kill-others --names tsc,wds \"npm run tsc:watch\" \"wds --app-index index.html --node-resolve --open --watch\"",
+    "start": "concurrently --kill-others --names tsc,wds \"npm run tsc:watch\" \"wds --config wds.config.js\"",
     "start:build": "npm run build && wds --root-dir dist --app-index index.html --open --compatibility none",
     "tsc:watch": "tsc --watch"
   },
   "dependencies": {
-    "@spectrum-web-components/button": "^0.17.3",
-    "@spectrum-web-components/field-label": "^0.7.8",
-    "@spectrum-web-components/menu": "^0.13.0",
-    "@spectrum-web-components/picker": "^0.11.0",
-    "@spectrum-web-components/styles": "^0.13.0"
+    "@spectrum-web-components/button": "^0.17.6",
+    "@spectrum-web-components/field-label": "^0.7.11",
+    "@spectrum-web-components/menu": "^0.14.2",
+    "@spectrum-web-components/picker": "^0.11.3",
+    "@spectrum-web-components/styles": "^0.13.2"
   },
   "devDependencies": {
     "@open-wc/building-rollup": "^2.0.1",
@@ -33,7 +34,7 @@
     "@types/node": "^17.0.8",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
-    "@web/dev-server": "^0.1.30",
+    "@web/dev-server": "^0.1.31",
     "concurrently": "^7.0.0",
     "eslint": "^8.2.0",
     "eslint-config-prettier": "^8.3.0",

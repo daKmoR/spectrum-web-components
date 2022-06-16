@@ -73,7 +73,7 @@ export class Dialog extends FocusVisiblePolyfillMixin(
         '[slot="button"]',
     ])
 ) {
-    public static get styles(): CSSResultArray {
+    public static override get styles(): CSSResultArray {
         return [styles, crossStyles];
     }
 
@@ -184,7 +184,7 @@ export class Dialog extends FocusVisiblePolyfillMixin(
         `;
     }
 
-    protected render(): TemplateResult {
+    protected override render(): TemplateResult {
         return html`
             <div class="grid">
                 ${this.renderHero()} ${this.renderHeading()}
@@ -213,7 +213,7 @@ export class Dialog extends FocusVisiblePolyfillMixin(
         }
     };
 
-    protected shouldUpdate(changes: PropertyValues): boolean {
+    protected override shouldUpdate(changes: PropertyValues): boolean {
         if (changes.has('mode') && !!this.mode) {
             this.dismissable = false;
         }
@@ -223,7 +223,7 @@ export class Dialog extends FocusVisiblePolyfillMixin(
         return super.shouldUpdate(changes);
     }
 
-    protected firstUpdated(changes: PropertyValues): void {
+    protected override firstUpdated(changes: PropertyValues): void {
         super.firstUpdated(changes);
         this.setAttribute('role', 'dialog');
     }
@@ -289,7 +289,7 @@ export class Dialog extends FocusVisiblePolyfillMixin(
         }
     }
 
-    public connectedCallback(): void {
+    public override connectedCallback(): void {
         super.connectedCallback();
         this.tabIndex = 0;
         window.addEventListener(
@@ -298,7 +298,7 @@ export class Dialog extends FocusVisiblePolyfillMixin(
         );
     }
 
-    public disconnectedCallback(): void {
+    public override disconnectedCallback(): void {
         window.removeEventListener(
             'resize',
             this.shouldManageTabOrderForScrolling

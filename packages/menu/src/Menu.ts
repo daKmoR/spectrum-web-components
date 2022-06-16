@@ -47,11 +47,6 @@ function elementIsOrContains(
     return !!isOrContains && (el === isOrContains || el.contains(isOrContains));
 }
 
-/* c8 ignore next 3 */
-const noop = (): void => {
-    return;
-};
-
 /**
  * Spectrum Menu Component
  * @element sp-menu
@@ -66,47 +61,11 @@ const noop = (): void => {
  *   Item children of this Menu will not have their `selected` state managed.
  */
 export class Menu extends SpectrumElement {
-    public static get styles(): CSSResultArray {
+    public static override get styles(): CSSResultArray {
         return [menuStyles];
     }
 
-    public get closeSelfAsSubmenu(): (leave?: boolean) => void {
-        this.isSubmenu = false;
-        return this._closeSelfAsSubmenu;
-    }
-
-    public setCloseSelfAsSubmenu(cb: (leave?: boolean) => void): void {
-        if (cb === this._closeSelfAsSubmenu) {
-            this.isSubmenu = false;
-            this._closeSelfAsSubmenu = noop;
-            return;
-        }
-        this.isSubmenu = true;
-        this._closeSelfAsSubmenu = cb;
-    }
-
-    _closeSelfAsSubmenu = noop;
-
     public isSubmenu = false;
-
-    public get closeOpenSubmenu(): (leave?: boolean) => void {
-        this.hasOpenSubmenu = false;
-        return this._closeOpenSubmenu;
-    }
-
-    public setCloseOpenSubmenu(cb: (leave?: boolean) => void): void {
-        if (cb === this._closeOpenSubmenu) {
-            this.hasOpenSubmenu = false;
-            this._closeOpenSubmenu = noop;
-            return;
-        }
-        this.hasOpenSubmenu = true;
-        this._closeOpenSubmenu = cb;
-    }
-
-    _closeOpenSubmenu = noop;
-
-    public hasOpenSubmenu = false;
 
     @property({ type: String, reflect: true })
     public label = '';
@@ -292,7 +251,7 @@ export class Menu extends SpectrumElement {
         this.addEventListener('focusin', this.handleFocusin);
     }
 
-    public focus({ preventScroll }: FocusOptions = {}): void {
+    public override focus({ preventScroll }: FocusOptions = {}): void {
         if (
             !this.childItems.length ||
             this.childItems.every((childItem) => childItem.disabled)
@@ -313,11 +272,6 @@ export class Menu extends SpectrumElement {
         if (selectedItem && !preventScroll) {
             selectedItem.scrollIntoView({ block: 'nearest' });
         }
-    }
-
-    public submenuWillCloseOn(menuItem: MenuItem): void {
-        this.focusedItemIndex = this.childItems.indexOf(menuItem);
-        this.focusInItemIndex = this.focusedItemIndex;
     }
 
     private onClick(event: Event): void {
@@ -341,12 +295,6 @@ export class Menu extends SpectrumElement {
             event.preventDefault();
             if (target.hasSubmenu || target.open) {
                 return;
-            }
-            if (this.hasOpenSubmenu) {
-                this.closeOpenSubmenu();
-            }
-            if (this.isSubmenu) {
-                this.closeSelfAsSubmenu();
             }
             this.selectOrToggleItem(target);
         } else {
@@ -514,10 +462,10 @@ export class Menu extends SpectrumElement {
                 // Remove focus while opening overlay from keyboard or the visible focus
                 // will slip back to the first item in the menu.
                 this.blur();
-                lastFocusedItem.openOverlay({ immediate: true });
+                lastFocusedItem.openOverlay();
             }
-        } else if (this.isSubmenu && shouldCloseSelfAsSubmenu) {
-            this.closeSelfAsSubmenu(true);
+        } else if (shouldCloseSelfAsSubmenu && this.isSubmenu) {
+            this.dispatchEvent(new Event('close', { bubbles: true }));
         }
     }
 
@@ -533,7 +481,7 @@ export class Menu extends SpectrumElement {
                 // Remove focus while opening overlay from keyboard or the visible focus
                 // will slip back to the first item in the menu.
                 this.blur();
-                lastFocusedItem.openOverlay({ immediate: true });
+                lastFocusedItem.openOverlay();
                 return;
             }
         }
@@ -677,7 +625,7 @@ export class Menu extends SpectrumElement {
         }
     }
 
-    public render(): TemplateResult {
+    public override render(): TemplateResult {
         return html`
             <slot></slot>
         `;
@@ -685,7 +633,7 @@ export class Menu extends SpectrumElement {
 
     private _notFirstUpdated = false;
 
-    protected firstUpdated(changed: PropertyValues): void {
+    protected override firstUpdated(changed: PropertyValues): void {
         super.firstUpdated(changed);
         if (!this.hasAttribute('tabindex')) {
             const role = this.getAttribute('role');
@@ -706,7 +654,7 @@ export class Menu extends SpectrumElement {
         this.childItemsUpdated = Promise.all(updates);
     }
 
-    protected updated(changes: PropertyValues<this>): void {
+    protected override updated(changes: PropertyValues<this>): void {
         super.updated(changes);
         if (changes.has('selects') && this._notFirstUpdated) {
             this.selectsChanged();
@@ -731,7 +679,7 @@ export class Menu extends SpectrumElement {
         this.childItemsUpdated = Promise.all(updates);
     }
 
-    public connectedCallback(): void {
+    public override connectedCallback(): void {
         super.connectedCallback();
         if (!this.hasAttribute('role')) {
             this.setAttribute('role', this.ownRole);
@@ -742,7 +690,7 @@ export class Menu extends SpectrumElement {
     protected childItemsUpdated!: Promise<unknown[]>;
     protected cacheUpdated = Promise.resolve();
 
-    protected async getUpdateComplete(): Promise<boolean> {
+    protected override async getUpdateComplete(): Promise<boolean> {
         const complete = (await super.getUpdateComplete()) as boolean;
         await this.childItemsUpdated;
         await this.cacheUpdated;
