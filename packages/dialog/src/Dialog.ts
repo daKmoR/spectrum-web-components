@@ -13,7 +13,6 @@ governing permissions and limitations under the License.
 import {
     CSSResultArray,
     html,
-    nothing,
     PropertyValues,
     SpectrumElement,
     TemplateResult,
@@ -159,7 +158,7 @@ export class Dialog extends FocusVisiblePolyfillMixin(
         return html`
             <sp-button-group
                 class="button-group ${this.hasFooter
-                    ? nothing
+                    ? html``
                     : 'button-group--noFooter'}"
             >
                 <slot name="button"></slot>
@@ -193,9 +192,9 @@ export class Dialog extends FocusVisiblePolyfillMixin(
                     ? html`
                           <sp-icon-alert class="type-icon"></sp-icon-alert>
                       `
-                    : nothing}
+                    : html``}
                 ${this.noDivider
-                    ? nothing
+                    ? html``
                     : html`
                           <sp-divider size="m" class="divider"></sp-divider>
                       `}
