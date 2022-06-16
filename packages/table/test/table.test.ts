@@ -165,6 +165,50 @@ describe('Table', () => {
         expect(firstSortable === test.shadowRoot?.activeElement).to.be.true;
     });
 
+    it('dispatches `sorted` events', async () => {
+        const el = await fixture<Table>(html`
+            <sp-table size="m">
+                <sp-table-head>
+                    <sp-table-head-cell sortable sorted="desc">
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell sortable>
+                        Column Title
+                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                </sp-table-head>
+            </sp-table>
+        `);
+
+        const tableHeadCell1 = el.querySelector(
+            '[sortable][sorted]'
+        ) as TableHeadCell;
+        const tableHeadCell2 = el.querySelector(
+            '[sortable]:not([sorted])'
+        ) as TableHeadCell;
+
+        tableHeadCell2.click();
+        await nextFrame();
+
+        expect(tableHeadCell1.hasAttribute('sorted')).to.be.false;
+        expect(tableHeadCell2.hasAttribute('sorted')).to.be.true;
+        expect(tableHeadCell2.getAttribute('sorted')).to.equal('asc');
+
+        tableHeadCell2.click();
+        await nextFrame();
+
+        expect(tableHeadCell1.hasAttribute('sorted')).to.be.false;
+        expect(tableHeadCell2.hasAttribute('sorted')).to.be.true;
+        expect(tableHeadCell2.getAttribute('sorted')).to.equal('desc');
+
+        tableHeadCell1.click();
+        await nextFrame();
+
+        expect(tableHeadCell2.hasAttribute('sorted')).to.be.false;
+        expect(tableHeadCell1.hasAttribute('sorted')).to.be.true;
+        expect(tableHeadCell1.getAttribute('sorted')).to.equal('asc');
+    });
+
     it('dispatches `change` events', async () => {
         const changeSpy = spy();
         const el = await fixture<Table>(html`
