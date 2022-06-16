@@ -258,21 +258,10 @@ When `selects` is set to "multiple", the `<sp-table-checkbox-cell>` in `<sp-tabl
 
 For large amounts of data, the `<sp-table>` can be virtualised to easily add table rows by using properties.
 
-```html
+```html-live
 <sp-table
     size="m"
-    items='[{"key1": "value1"}, {"key2": "value2"}, {"key3": "value3"}]'
-    renderItem='
-        const items = [{"key1": "value1"}, {"key2": "value2"}, {"key3": "value3"}];
-        const table = this.nextElementSibling;
-        function renderItems(item, index) {
-            return `
-                <sp-table-cell>Row Item Alpha ${item}</sp-table-cell>
-                <sp-table-cell>Row Item Alpha ${index}</sp-table-cell>
-                `;
-            }
-        items.forEach((item, index) => { renderItems(item, index); }
-        '
+    id="table-virtualized-demo"
 >
     <sp-table-head>
         <sp-table-head-cell>Column Title</sp-table-head-cell>
@@ -280,7 +269,39 @@ For large amounts of data, the `<sp-table>` can be virtualised to easily add tab
         <sp-table-head-cell>Column Title</sp-table-head-cell>
     </sp-table-head>
 </sp-table>
+<script type="module">
+    const table = document.querySelector('#table-virtualized-demo');
+    table.items = [{"value": "value1"}, {"value": "value2"}, {"value": "value3"}];
+
+    table.renderItem = (item, index) => {
+        const cell1 = document.createElement('sp-table-cell');
+        const cell2 = document.createElement('sp-table-cell');
+        const cell3 = document.createElement('sp-table-cell');
+        cell1.textContent = `Row Item Alpha ${item.value}`;
+        cell2.textContent = `Row Item Alpha ${index}`;
+        cell3.textContent = `Last Thing`;
+        return [cell1, cell2, cell3];
+    }
+</script>
 ```
+
+<script type="module">
+    const initTable = () => {
+        const table = document.querySelector('#table-virtualized-demo');
+        table.items = [{"value": "value1"}, {"value": "value2"}, {"value": "value3"}];
+
+        table.renderItem = (item, index) => { 
+            const cell1 = document.createElement('sp-table-cell');
+            const cell2 = document.createElement('sp-table-cell');
+            const cell3 = document.createElement('sp-table-cell');
+            cell1.textContent = `Row Item Alpha ${item.value}`;
+            cell2.textContent = `Row Item Alpha ${index}`;
+            cell3.textContent = `Last Thing`;
+            return [cell1, cell2, cell3];
+        }
+    };
+    setTimeout(initTable, 500);
+</script>
 
 ### How to use it
 
