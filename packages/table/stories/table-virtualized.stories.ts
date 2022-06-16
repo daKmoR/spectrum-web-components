@@ -26,7 +26,6 @@ import '../sp-table-cell.js';
 import { Item, makeItems, makeItemsTwo, Properties } from './index.js';
 import type { SortedEventDetails } from '../src/TableHeadCell.js';
 import { RangeChangedEvent, Table } from '../src/Table.js';
-import { TableRow } from '../src/TableRow.js';
 
 export default {
     title: 'Table/Virtualized',
@@ -46,45 +45,6 @@ export default {
     args: {
         selects: '',
     },
-};
-
-class TableDefined extends HTMLElement {
-    constructor() {
-        super();
-        this.tableLoaderPromise = new Promise((res) => {
-            this.tableLoaderResolved = res;
-        });
-        requestAnimationFrame(this.amIReady);
-    }
-
-    private amIReady = async (): Promise<void> => {
-        const table = this.nextElementSibling as Table;
-        const tableRow = table.querySelector('sp-table-row') as TableRow;
-
-        if (tableRow) {
-            await tableRow.updateComplete;
-            this.tableLoaderResolved(true);
-        } else {
-            requestAnimationFrame(this.amIReady);
-        }
-    };
-    private tableLoaderResolved = (_arg: boolean): void => {
-        return;
-    };
-    private tableLoaderPromise: Promise<boolean> = Promise.resolve(false);
-
-    get updateComplete(): Promise<boolean> {
-        return this.tableLoaderPromise;
-    }
-}
-
-customElements.define('table-defined', TableDefined);
-
-const tableDecorator = (story: () => TemplateResult): TemplateResult => {
-    return html`
-        <table-defined></table-defined>
-        ${story()}
-    `;
 };
 
 class VirtualTable extends SpectrumElement {
@@ -237,7 +197,6 @@ export const virtualizedSingle = (args: Properties): TemplateResult => {
 virtualizedSingle.args = {
     selects: 'single',
 };
-virtualizedSingle.decorators = [tableDecorator];
 
 export const virtualizedMultiple = (args: Properties): TemplateResult => {
     const virtualItems = makeItemsTwo(50);
@@ -286,7 +245,6 @@ export const virtualizedMultiple = (args: Properties): TemplateResult => {
 virtualizedMultiple.args = {
     selects: 'multiple',
 };
-virtualizedMultiple.decorators = [tableDecorator];
 
 export const virtualizedCustomValue = (args: Properties): TemplateResult => {
     const virtualItems = makeItemsTwo(50);
@@ -336,4 +294,3 @@ export const virtualizedCustomValue = (args: Properties): TemplateResult => {
 virtualizedCustomValue.args = {
     selects: 'multiple',
 };
-virtualizedCustomValue.decorators = [tableDecorator];
