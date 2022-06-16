@@ -37,6 +37,13 @@ export default {
     title: 'Table/Virtualized',
     component: 'sp-table',
     argTypes: {
+        onChange: { action: 'change' },
+        selected: {
+            name: 'selected',
+            description: 'The array of item values selected by the Table.',
+            type: { name: '', required: false },
+            control: 'text',
+        },
         selects: {
             name: 'selects',
             description:
@@ -46,7 +53,6 @@ export default {
                 options: ['', 'single', 'multiple'],
             },
         },
-        onChange: { action: 'change' },
     },
     args: {
         selects: '',
