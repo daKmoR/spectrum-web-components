@@ -10,6 +10,8 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+import { html, TemplateResult } from '@spectrum-web-components/base';
+
 export type Properties = {
     selects?: undefined | 'single' | 'multiple';
     onChange: (eventData: {
@@ -55,3 +57,11 @@ export function makeItems(count: number): {
     }
     return items;
 }
+
+export const renderItem = (item: Item, index: number): TemplateResult => {
+    return html`
+        <sp-table-cell>Row Item ${item.name}</sp-table-cell>
+        <sp-table-cell>Row Item ${item.date}</sp-table-cell>
+        <sp-table-cell>Row Item ${index}</sp-table-cell>
+    `;
+};

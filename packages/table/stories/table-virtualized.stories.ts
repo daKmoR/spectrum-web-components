@@ -23,7 +23,13 @@ import '../sp-table-head-cell.js';
 import '../sp-table-body.js';
 import '../sp-table-row.js';
 import '../sp-table-cell.js';
-import { Item, makeItems, makeItemsTwo, Properties } from './index.js';
+import {
+    Item,
+    makeItems,
+    makeItemsTwo,
+    Properties,
+    renderItem,
+} from './index.js';
 import type { SortedEventDetails } from '../src/TableHeadCell.js';
 import { RangeChangedEvent, Table } from '../src/Table.js';
 
@@ -34,7 +40,7 @@ export default {
         selects: {
             name: 'selects',
             description:
-                'If the Table can accepts a "single" or "multiple" selection.',
+                'If the Table accepts a "single" or "multiple" selection.',
             control: {
                 type: 'inline-radio',
                 options: ['', 'single', 'multiple'],
@@ -85,20 +91,12 @@ class VirtualTable extends SpectrumElement {
             }
         };
 
-    renderItem = (item: Item, index: number): TemplateResult => {
-        return html`
-            <sp-table-cell>Row Item Alpha ${item.name}</sp-table-cell>
-            <sp-table-cell>Row Item Alpha ${item.date}</sp-table-cell>
-            <sp-table-cell>Row Item Alpha ${index}</sp-table-cell>
-        `;
-    };
-
     protected override render(): TemplateResult {
         return html`
             <sp-table
                 aria-rowcount="50"
                 .items=${this.items}
-                .renderItem=${this.renderItem}
+                .renderItem=${renderItem}
                 style="height: 200px"
                 size="m"
                 @sorted=${(event: CustomEvent<SortedEventDetails>): void => {
@@ -122,7 +120,7 @@ class VirtualTable extends SpectrumElement {
                 </sp-table-head>
             </sp-table>
         `;
-    } // .itemValue=${(item) => {return item.name}} <-- but this in sptablebody
+    }
 }
 
 customElements.define('virtual-table', VirtualTable);
@@ -135,14 +133,6 @@ export const virtualized = (): TemplateResult => {
 
 export const virtualizedSingle = (args: Properties): TemplateResult => {
     const virtualItems = makeItemsTwo(50);
-
-    const renderItem = (item: Item, index: number): TemplateResult => {
-        return html`
-            <sp-table-cell>Rowsa Item Alpha ${item.name}</sp-table-cell>
-            <sp-table-cell>Row Item Alpha ${item.date}</sp-table-cell>
-            <sp-table-cell>Row Item Alpha ${index}</sp-table-cell>
-        `;
-    };
 
     const onChange =
         (args.onChange as (eventData: {
@@ -182,12 +172,8 @@ export const virtualizedSingle = (args: Properties): TemplateResult => {
                 })}
         >
             <sp-table-head>
-                <sp-table-head-cell sortable sortby="name" sorted="desc">
-                    Column Title
-                </sp-table-head-cell>
-                <sp-table-head-cell sortable sortby="date">
-                    Column Title
-                </sp-table-head-cell>
+                <sp-table-head-cell>Column Title</sp-table-head-cell>
+                <sp-table-head-cell>Column Title</sp-table-head-cell>
                 <sp-table-head-cell>Column Title</sp-table-head-cell>
             </sp-table-head>
         </sp-table>
@@ -229,12 +215,8 @@ export const virtualizedMultiple = (args: Properties): TemplateResult => {
             .renderItem=${renderItem}
         >
             <sp-table-head>
-                <sp-table-head-cell sortable sortby="name" sorted="desc">
-                    Column Title
-                </sp-table-head-cell>
-                <sp-table-head-cell sortable sortby="date">
-                    Column Title
-                </sp-table-head-cell>
+                <sp-table-head-cell>Column Title</sp-table-head-cell>
+                <sp-table-head-cell>Column Title</sp-table-head-cell>
                 <sp-table-head-cell>Column Title</sp-table-head-cell>
             </sp-table-head>
         </sp-table>
@@ -248,14 +230,6 @@ virtualizedMultiple.args = {
 
 export const virtualizedCustomValue = (args: Properties): TemplateResult => {
     const virtualItems = makeItemsTwo(50);
-
-    const renderItem = (item: Item, index: number): TemplateResult => {
-        return html`
-            <sp-table-cell>Rowsaa Item Alpha ${item.name}</sp-table-cell>
-            <sp-table-cell>Row Item Alpha ${item.date}</sp-table-cell>
-            <sp-table-cell>Row Item Alpha ${index}</sp-table-cell>
-        `;
-    };
 
     return html`
         <sp-table
@@ -277,12 +251,8 @@ export const virtualizedCustomValue = (args: Properties): TemplateResult => {
             .renderItem=${renderItem}
         >
             <sp-table-head>
-                <sp-table-head-cell sortable sortby="name" sorted="desc">
-                    Column Title
-                </sp-table-head-cell>
-                <sp-table-head-cell sortable sortby="date">
-                    Column Title
-                </sp-table-head-cell>
+                <sp-table-head-cell>Column Title</sp-table-head-cell>
+                <sp-table-head-cell>Column Title</sp-table-head-cell>
                 <sp-table-head-cell>Column Title</sp-table-head-cell>
             </sp-table-head>
             <sp-table-body style="height: 120px" scroller></sp-table-body>
