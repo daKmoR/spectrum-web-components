@@ -169,7 +169,7 @@ describe('Table', () => {
         const el = await fixture<Table>(html`
             <sp-table size="m">
                 <sp-table-head>
-                    <sp-table-head-cell sortable sorted="desc">
+                    <sp-table-head-cell sortable sort-direction="desc">
                         Column Title
                     </sp-table-head-cell>
                     <sp-table-head-cell sortable>
@@ -181,32 +181,32 @@ describe('Table', () => {
         `);
 
         const tableHeadCell1 = el.querySelector(
-            '[sortable][sorted]'
+            '[sortable][sort-direction]'
         ) as TableHeadCell;
         const tableHeadCell2 = el.querySelector(
-            '[sortable]:not([sorted])'
+            '[sortable]:not([sort-direction])'
         ) as TableHeadCell;
 
         tableHeadCell2.click();
         await nextFrame();
 
-        expect(tableHeadCell1.hasAttribute('sorted')).to.be.false;
-        expect(tableHeadCell2.hasAttribute('sorted')).to.be.true;
-        expect(tableHeadCell2.getAttribute('sorted')).to.equal('asc');
+        expect(tableHeadCell1.hasAttribute('sort-direction')).to.be.false;
+        expect(tableHeadCell2.hasAttribute('sort-direction')).to.be.true;
+        expect(tableHeadCell2.getAttribute('sort-direction')).to.equal('asc');
 
         tableHeadCell2.click();
         await nextFrame();
 
-        expect(tableHeadCell1.hasAttribute('sorted')).to.be.false;
-        expect(tableHeadCell2.hasAttribute('sorted')).to.be.true;
-        expect(tableHeadCell2.getAttribute('sorted')).to.equal('desc');
+        expect(tableHeadCell1.hasAttribute('sort-direction')).to.be.false;
+        expect(tableHeadCell2.hasAttribute('sort-direction')).to.be.true;
+        expect(tableHeadCell2.getAttribute('sort-direction')).to.equal('desc');
 
         tableHeadCell1.click();
         await nextFrame();
 
-        expect(tableHeadCell2.hasAttribute('sorted')).to.be.false;
-        expect(tableHeadCell1.hasAttribute('sorted')).to.be.true;
-        expect(tableHeadCell1.getAttribute('sorted')).to.equal('asc');
+        expect(tableHeadCell2.hasAttribute('sort-direction')).to.be.false;
+        expect(tableHeadCell1.hasAttribute('sort-direction')).to.be.true;
+        expect(tableHeadCell1.getAttribute('sort-direction')).to.equal('asc');
     });
 
     it('dispatches `change` events', async () => {
@@ -221,12 +221,8 @@ describe('Table', () => {
                 }}
             >
                 <sp-table-head>
-                    <sp-table-head-cell sortable sorted="desc">
-                        Column Title
-                    </sp-table-head-cell>
-                    <sp-table-head-cell sortable>
-                        Column Title
-                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
                 <sp-table-body style="height: 120px">
@@ -300,12 +296,8 @@ describe('Table', () => {
                 }}
             >
                 <sp-table-head>
-                    <sp-table-head-cell sortable sorted="desc">
-                        Column Title
-                    </sp-table-head-cell>
-                    <sp-table-head-cell sortable>
-                        Column Title
-                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
                 <sp-table-body style="height: 120px">
@@ -336,7 +328,6 @@ describe('Table', () => {
                     </sp-table-row>
                 </sp-table-body>
             </sp-table>
-            <div>Selected:</div>
         `);
         const tableHeadCheckboxCell = el.querySelector(
             'sp-table-head sp-table-checkbox-cell'
@@ -460,9 +451,7 @@ describe('Table', () => {
                 scroller?="true"
             >
                 <sp-table-head>
-                    <sp-table-head-cell sortable sortby="name" sorted="desc">
-                        Column Title
-                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
@@ -530,9 +519,7 @@ describe('Table', () => {
         const el = await fixture<Table>(html`
             <sp-table size="m" .selected=${['row3']}>
                 <sp-table-head>
-                    <sp-table-head-cell sortable sorted="desc">
-                        Column Title
-                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
@@ -580,9 +567,7 @@ describe('Table', () => {
                 scroller?="true"
             >
                 <sp-table-head>
-                    <sp-table-head-cell sortable sortby="name" sorted="desc">
-                        Column Title
-                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
@@ -601,9 +586,7 @@ describe('Table', () => {
         const el = await fixture<Table>(html`
             <sp-table size="m" .selected=${['row2', 'row3']}>
                 <sp-table-head>
-                    <sp-table-head-cell sortable sorted="desc">
-                        Column Title
-                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
@@ -653,9 +636,7 @@ describe('Table', () => {
                 scroller?="true"
             >
                 <sp-table-head>
-                    <sp-table-head-cell sortable sortby="name" sorted="desc">
-                        Column Title
-                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
@@ -677,12 +658,8 @@ describe('Table', () => {
         const el = await fixture<Table>(html`
             <sp-table size="m" selects="single">
                 <sp-table-head>
-                    <sp-table-head-cell sortable sorted="desc">
-                        Column Title
-                    </sp-table-head-cell>
-                    <sp-table-head-cell sortable>
-                        Column Title
-                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
                 <sp-table-body style="height: 120px">
@@ -733,12 +710,8 @@ describe('Table', () => {
         const el = await fixture<Table>(html`
             <sp-table size="m" selects="multiple">
                 <sp-table-head>
-                    <sp-table-head-cell sortable sorted="desc">
-                        Column Title
-                    </sp-table-head-cell>
-                    <sp-table-head-cell sortable>
-                        Column Title
-                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
                 <sp-table-body style="height: 120px">
@@ -803,12 +776,8 @@ describe('Table', () => {
         const el = await fixture<Table>(html`
             <sp-table size="m">
                 <sp-table-head>
-                    <sp-table-head-cell sortable sorted="desc">
-                        Column Title
-                    </sp-table-head-cell>
-                    <sp-table-head-cell sortable>
-                        Column Title
-                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
                 <sp-table-body style="height: 120px">
@@ -892,12 +861,8 @@ describe('Table', () => {
         const el = await fixture<Table>(html`
             <sp-table size="m" selects="multiple" .selected=${['row1']}>
                 <sp-table-head>
-                    <sp-table-head-cell sortable sorted="desc">
-                        Column Title
-                    </sp-table-head-cell>
-                    <sp-table-head-cell sortable>
-                        Column Title
-                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
                 <sp-table-body style="height: 120px">
@@ -965,9 +930,7 @@ describe('Table', () => {
                 scroller?="true"
             >
                 <sp-table-head>
-                    <sp-table-head-cell sortable sortby="name" sorted="desc">
-                        Column Title
-                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
@@ -1013,9 +976,7 @@ describe('Table', () => {
                 scroller?="true"
             >
                 <sp-table-head>
-                    <sp-table-head-cell sortable sortby="name" sorted="desc">
-                        Column Title
-                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
@@ -1062,9 +1023,7 @@ describe('Table', () => {
                 scroller?="true"
             >
                 <sp-table-head>
-                    <sp-table-head-cell sortable sortby="name" sorted="desc">
-                        Column Title
-                    </sp-table-head-cell>
+                    <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
                 </sp-table-head>
