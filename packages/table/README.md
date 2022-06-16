@@ -270,25 +270,56 @@ For large amounts of data, the `<sp-table>` can be virtualised to easily add tab
     </sp-table-head>
 </sp-table>
 <script type="module">
-    const table = document.querySelector('#table-virtualized-demo');
-    table.items = [{"value": "value1"}, {"value": "value2"}, {"value": "value3"}];
-
-    table.renderItem = (item, index) => {
-        const cell1 = document.createElement('sp-table-cell');
-        const cell2 = document.createElement('sp-table-cell');
-        const cell3 = document.createElement('sp-table-cell');
-        cell1.textContent = `Row Item Alpha ${item.value}`;
-        cell2.textContent = `Row Item Alpha ${index}`;
-        cell3.textContent = `Last Thing`;
-        return [cell1, cell2, cell3];
+    const initItems = (count) => {
+        const total = count;
+        const items = [];
+        while (count) {
+            count--;
+            items.push({
+                name: String(total - count),
+                date: count,
+            });
+        }
+        return items;
     }
+
+    }
+    const initTable = () => {
+        const table = document.querySelector('#table-virtualized-demo');
+        table.items = initItems(50);
+
+        table.renderItem = (item, index) => {
+            const cell1 = document.createElement('sp-table-cell');
+            const cell2 = document.createElement('sp-table-cell');
+            const cell3 = document.createElement('sp-table-cell');
+            cell1.textContent = `Row Item Alpha ${item.value}`;
+            cell2.textContent = `Row Item Alpha ${index}`;
+            cell3.textContent = `Last Thing`;
+            return [cell1, cell2, cell3];
+        }
+    };
+    setTimeout(initTable, 500);
 </script>
 ```
 
 <script type="module">
+    const initItems = (count) => {
+        const total = count;
+        const items = [];
+        while (count) {
+            count--;
+            items.push({
+                name: String(total - count),
+                date: count,
+            });
+        }
+        return items;
+    }
+
+    }
     const initTable = () => {
         const table = document.querySelector('#table-virtualized-demo');
-        table.items = [{"value": "value1"}, {"value": "value2"}, {"value": "value3"}];
+        table.items = initItems(50);
 
         table.renderItem = (item, index) => { 
             const cell1 = document.createElement('sp-table-cell');

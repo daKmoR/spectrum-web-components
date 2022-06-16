@@ -23,16 +23,16 @@ import styles from './table-head-cell.css.js';
 import arrowStyles from '@spectrum-web-components/icon/src/spectrum-icon-arrow.css.js';
 
 export type SortedEventDetails = {
-    sorted: 'asc' | 'desc';
-    sortBy: string;
+    sortDirection: 'asc' | 'desc';
+    sortKey: string;
 };
 
-const ariaSortValue = (sorted?: 'asc' | 'desc'): string => {
+const ariaSortValue = (sortDirection?: 'asc' | 'desc'): string => {
     const values = {
         asc: 'ascending',
         desc: 'descending',
     };
-    return values[sorted as 'asc' | 'desc'] || 'none';
+    return values[sortDirection as 'asc' | 'desc'] || 'none';
 };
 
 /**
@@ -49,35 +49,35 @@ export class TableHeadCell extends SpectrumElement {
     @property({ type: Boolean, reflect: true })
     public sortable = false;
 
-    @property({ reflect: true })
-    public sorted: 'asc' | 'desc' | undefined;
+    @property({ reflect: true, attribute: 'sort-direction' })
+    public sortDirection: 'asc' | 'desc' | undefined;
 
-    @property()
-    public sortBy = '';
+    @property({ attribute: 'sort-key' })
+    public sortKey = '';
 
     @property({ type: Number, reflect: true })
     public override tabIndex = -1;
 
     protected handleClick(): void {
         if (!this.sortable) return;
-        if (this.sorted) {
-            this.sorted = this.sorted === 'asc' ? 'desc' : 'asc';
+        if (this.sortDirection) {
+            this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
         } else {
-            this.sorted = 'asc';
+            this.sortDirection = 'asc';
         }
         this.dispatchEvent(
             new CustomEvent<SortedEventDetails>('sorted', {
                 bubbles: true,
                 detail: {
-                    sorted: this.sorted,
-                    sortBy: this.sortBy,
+                    sortDirection: this.sortDirection,
+                    sortKey: this.sortKey,
                 },
             })
         );
     }
 
     protected override render(): TemplateResult {
-        const visiblySorted = this.sortable && !!this.sorted;
+        const visiblySorted = this.sortable && !!this.sortDirection;
         return html`
             <slot></slot>
             ${visiblySorted
@@ -97,7 +97,7 @@ export class TableHeadCell extends SpectrumElement {
 
     protected override update(changes: PropertyValues): void {
         if (changes.has('sorted')) {
-            this.setAttribute('aria-sort', ariaSortValue(this.sorted));
+            this.setAttribute('aria-sort', ariaSortValue(this.sortDirection));
         }
         if (changes.has('sortable')) {
             this.tabIndex = this.sortable ? 0 : -1;

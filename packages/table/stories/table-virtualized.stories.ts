@@ -68,11 +68,11 @@ class VirtualTable extends SpectrumElement {
 
     constructor() {
         super();
-        this.items.sort(this.sortItems('name', 'desc'));
+        this.items.sort(this.compareItems('name', 'desc'));
     }
 
-    sortItems =
-        (sortBy: 'name' | 'date', sorted: 'asc' | 'desc') =>
+    compareItems =
+        (sortKey: 'name' | 'date', sortDirection: 'asc' | 'desc') =>
         (
             a: {
                 name: string;
@@ -83,15 +83,17 @@ class VirtualTable extends SpectrumElement {
                 date: number;
             }
         ): number => {
-            const doSortBy = sortBy;
-            if (!isNaN(Number(a[doSortBy]))) {
-                const first = Number(a[doSortBy]);
-                const second = Number(b[doSortBy]);
-                return sorted === 'asc' ? first - second : second - first;
+            const doSortKey = sortKey;
+            if (!isNaN(Number(a[doSortKey]))) {
+                const first = Number(a[doSortKey]);
+                const second = Number(b[doSortKey]);
+                return sortDirection === 'asc'
+                    ? first - second
+                    : second - first;
             } else {
-                const first = String(a[doSortBy]);
-                const second = String(b[doSortBy]);
-                return sorted === 'asc'
+                const first = String(a[doSortKey]);
+                const second = String(b[doSortKey]);
+                return sortDirection === 'asc'
                     ? first.localeCompare(second)
                     : second.localeCompare(first);
             }
@@ -106,20 +108,27 @@ class VirtualTable extends SpectrumElement {
                 style="height: 200px"
                 size="m"
                 @sorted=${(event: CustomEvent<SortedEventDetails>): void => {
-                    const { sortBy, sorted } = event.detail; // leveraged CustomEvent().detail, works across shadow boundaries
+                    const { sortKey, sortDirection } = event.detail; // leveraged CustomEvent().detail, works across shadow boundaries
                     const items = [...this.items];
                     // depending on the column, sort asc or desc depending on the arrow direction
                     items.sort(
-                        this.sortItems(sortBy as 'name' | 'date', sorted)
+                        this.compareItems(
+                            sortKey as 'name' | 'date',
+                            sortDirection
+                        )
                     );
                     this.items = items;
                 }}
             >
                 <sp-table-head>
-                    <sp-table-head-cell sortable sortby="name" sorted="desc">
+                    <sp-table-head-cell
+                        sortable
+                        sort-key="name"
+                        sort-direction="desc"
+                    >
                         Column Title
                     </sp-table-head-cell>
-                    <sp-table-head-cell sortable sortby="date">
+                    <sp-table-head-cell sortable sort-key="date">
                         Column Title
                     </sp-table-head-cell>
                     <sp-table-head-cell>Column Title</sp-table-head-cell>
