@@ -281,9 +281,7 @@ For large amounts of data, the `<sp-table>` can be virtualised to easily add tab
             });
         }
         return items;
-    }
-
-    }
+    };
     const initTable = () => {
         const table = document.querySelector('#table-virtualized-demo');
         table.items = initItems(50);
