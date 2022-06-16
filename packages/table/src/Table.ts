@@ -445,9 +445,7 @@ export class Table extends SpectrumElement {
             };
         } = {
             items: this.items,
-            renderItem: (item, index) => {
-                return this.renderItem(item, index);
-            },
+            renderItem: this.renderItem,
             scroller: true,
         };
         if (index) {
