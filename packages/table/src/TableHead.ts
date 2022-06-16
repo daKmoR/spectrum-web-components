@@ -40,7 +40,7 @@ export class TableHead extends SpectrumElement {
         // Not sure this is in the right place.
         childCells.forEach((cell) => {
             if (cell !== target) {
-                cell.sorted = undefined;
+                cell.sortDirection = undefined;
             }
         });
     }

@@ -80,12 +80,12 @@ To ensure that the table scrolls, make sure to add a `style` attribute to `<sp-t
 
 ## Sorting
 
-For each table column you want to sort, use the `sortable` attribute in its respective `<sp-table-head-cell>`. You can also sort table items without having the user trigger the sorting by using `sorted="asc"|"desc"` for ascending and descending order, respectively. The `sortby` attribute is an event detail specifying which aspect of a particular item in the table you are choosing to sort by.
+For each table column you want to sort, use the `sortable` attribute in its respective `<sp-table-head-cell>`. `sort-direction="asc"|"desc"` specifies the direction the sort goes, in either ascending or descending order, respectively. The `@sorted` event listener on `<sp-table>` can be utilised to specify a method to fire when the `<sp-table-head-cell>` dispatches the `sorted` event. To specify which aspect of an item you'd like to sort by, use the `sort-key` attribute.
 
 ```html
 <sp-table size="m" style="height: 120px">
     <sp-table-head>
-        <sp-table-head-cell sortable sorted="asc">
+        <sp-table-head-cell sortable sort-direction="asc">
             Column Title
         </sp-table-head-cell>
         <sp-table-head-cell>Column Title</sp-table-head-cell>
