@@ -42,7 +42,7 @@ import {
 To ensure that the table scrolls, make sure to add a `style` attribute to `<sp-table>` with your desired height. Otherwise, the table will automatically show all its items.
 
 ```html
-<sp-table size="m" style="height: 120px">
+<sp-table size="m">
     <sp-table-head>
         <sp-table-head-cell>Column Title</sp-table-head-cell>
         <sp-table-head-cell>Column Title</sp-table-head-cell>
@@ -58,49 +58,6 @@ To ensure that the table scrolls, make sure to add a `style` attribute to `<sp-t
             <sp-table-cell>Row Item Bravo</sp-table-cell>
             <sp-table-cell>Row Item Bravo</sp-table-cell>
             <sp-table-cell>Row Item Bravo</sp-table-cell>
-        </sp-table-row>
-        <sp-table-row>
-            <sp-table-cell>Row Item Charlie</sp-table-cell>
-            <sp-table-cell>Row Item Charlie</sp-table-cell>
-            <sp-table-cell>Row Item Charlie</sp-table-cell>
-        </sp-table-row>
-        <sp-table-row>
-            <sp-table-cell>Row Item Delta</sp-table-cell>
-            <sp-table-cell>Row Item Delta</sp-table-cell>
-            <sp-table-cell>Row Item Delta</sp-table-cell>
-        </sp-table-row>
-        <sp-table-row>
-            <sp-table-cell>Row Item Echo</sp-table-cell>
-            <sp-table-cell>Row Item Echo</sp-table-cell>
-            <sp-table-cell>Row Item Echo</sp-table-cell>
-        </sp-table-row>
-    </sp-table-body>
-</sp-table>
-```
-
-## Sorting
-
-For each table column you want to sort, use the `sortable` attribute in its respective `<sp-table-head-cell>`. `sort-direction="asc"|"desc"` specifies the direction the sort goes, in either ascending or descending order, respectively. The `@sorted` event listener on `<sp-table>` can be utilised to specify a method to fire when the `<sp-table-head-cell>` dispatches the `sorted` event. To specify which aspect of an item you'd like to sort by, use the `sort-key` attribute.
-
-```html
-<sp-table size="m" style="height: 120px">
-    <sp-table-head>
-        <sp-table-head-cell sortable sort-direction="asc">
-            Column Title
-        </sp-table-head-cell>
-        <sp-table-head-cell>Column Title</sp-table-head-cell>
-        <sp-table-head-cell>Column Title</sp-table-head-cell>
-    </sp-table-head>
-    <sp-table-body>
-        <sp-table-row>
-            <sp-table-cell>Row Item Bravo</sp-table-cell>
-            <sp-table-cell>Row Item Bravo</sp-table-cell>
-            <sp-table-cell>Row Item Bravo</sp-table-cell>
-        </sp-table-row>
-        <sp-table-row>
-            <sp-table-cell>Row Item Alpha</sp-table-cell>
-            <sp-table-cell>Row Item Alpha</sp-table-cell>
-            <sp-table-cell>Row Item Alpha</sp-table-cell>
         </sp-table-row>
         <sp-table-row>
             <sp-table-cell>Row Item Charlie</sp-table-cell>
@@ -126,7 +83,7 @@ For each table column you want to sort, use the `sortable` attribute in its resp
 To manage selection on an `<sp-table>`, utilise the `selects` attribute on `<sp-table>`. Each `<sp-table-row>` has a `value` attribute which, by default, corresponds to its index in the table, and these `value`s tell `<sp-table>` which `<sp-table-row>`s are selected. The selected items can be manually fed in through the `.selected` attribute on the table.
 
 ```html
-<sp-table size="m" style="height: 120px">
+<sp-table size="m">
     <sp-table-head>
         <sp-table-head-cell sortable sort>Column Title</sp-table-head-cell>
         <sp-table-head-cell>Column Title</sp-table-head-cell>
@@ -169,8 +126,8 @@ To manage selection on an `<sp-table>`, utilise the `selects` attribute on `<sp-
     size="m"
     selects="single"
     selected='["row1"]'
-    style="height: 120px"
-    onchange="spAlert(`Selected: ${JSON.stringify(this.selected)`)"
+    style="height: 200px"
+    onchange="spAlert(this, `Selected: ${JSON.stringify(this.selected)}`)"
 >
     <sp-table-head>
         <sp-table-head-cell>Column Title</sp-table-head-cell>
@@ -214,10 +171,10 @@ When `selects` is set to "multiple", the `<sp-table-checkbox-cell>` in `<sp-tabl
 ```html
 <sp-table
     size="m"
-    style="height: 120px"
+    style="height: 200px"
     selects="multiple"
     selected='["row1", "row2"]'
-    onchange="spAlert(`Selected: ${JSON.stringify(this.selected)`)"
+    onchange="spAlert(this, `Selected: ${JSON.stringify(this.selected)}`)"
 >
     <sp-table-head>
         <sp-table-head-cell>Column Title</sp-table-head-cell>
@@ -262,6 +219,7 @@ For large amounts of data, the `<sp-table>` can be virtualised to easily add tab
 <sp-table
     size="m"
     id="table-virtualized-demo"
+    style="height: 200px"
 >
     <sp-table-head>
         <sp-table-head-cell>Column Title</sp-table-head-cell>
@@ -296,7 +254,9 @@ For large amounts of data, the `<sp-table>` can be virtualised to easily add tab
             return [cell1, cell2, cell3];
         }
     };
-    setTimeout(initTable, 500);
+    customElements.whenDefined('sp-table').then(() => {
+        initTable();
+    });
 </script>
 ```
 
@@ -314,7 +274,6 @@ For large amounts of data, the `<sp-table>` can be virtualised to easily add tab
         return items;
     }
 
-    }
     const initTable = () => {
         const table = document.querySelector('#table-virtualized-demo');
         table.items = initItems(50);
@@ -329,12 +288,14 @@ For large amounts of data, the `<sp-table>` can be virtualised to easily add tab
             return [cell1, cell2, cell3];
         }
     };
-    setTimeout(initTable, 500);
+    customElements.whenDefined('sp-table').then(() => {
+        initTable();
+    });
 </script>
 
 ### How to use it
 
-The virtualised table takes `.items`, an array of type `Record`, where the key is a `string` and the value can be whatever you'd like. `.items` is then fed into the `renderItem` method, which takes an `item` and its `index` as parameters and renders the `<sp-table-row>` for each item. An example is as follows:
+The virtualised table takes `items` as either a property or a JSON-encoded string, an array of type `Record`, where the key is a `string` and the value can be whatever you'd like. `items` is then fed into the `renderItem` method, which takes an `item` and its `index` as parameters and renders the `<sp-table-row>` for each item. An example is as follows:
 
 ```javascript
 const renderItem = (item: Item, index: number): TemplateResult => {
@@ -346,19 +307,122 @@ const renderItem = (item: Item, index: number): TemplateResult => {
 };
 ```
 
-`.renderItem` is then included as a property of `<sp-table>`, along with the `.items`, to render a full `<sp-table>` without excessive manual HTML writing.
+`renderItem` is then included as a property of `<sp-table>`, along with the `items`, to render a full `<sp-table>` without excessive manual HTML writing.
 
 Please note that there is a bug when attempting to select all virtualised elements. The items are selected programatically, it's just not reflected visually.
 
-## TO-DO:
+## Sorting on the Virtualized Table
 
-Scrolling w/ screenreader on virtualised table elements
+The virtualized table supports sorting its elements.
 
-NOT CURRENTLY NEEDED but still important:
+For each table column you want to sort, use the `sortable` attribute in its respective `<sp-table-head-cell>`. `sort-direction="asc"|"desc"` specifies the direction the sort goes, in either ascending or descending order, respectively. The `@sorted` event listener on `<sp-table>` can be utilised to specify a method to fire when the `<sp-table-head-cell>` dispatches the `sorted` event. To specify which aspect of an item you'd like to sort by, use the `sort-key` attribute.
 
-1. multiselects via attributes (not required for Express delivery)
-2. Update checkbox element to dispatch event correctly
-3. Non-virtual sorting (ie sort data supplied through the DOM)
-4. Handle the console error that happens when we don't use Virtualizer
-5. Manage sort internally & prevent sort events
-6. Preventing change events
+```html-live
+<sp-table
+    size="m"
+    id="sorted-virtualized-table"
+>
+    <sp-table-head>
+        <sp-table-head-cell sortable sort-direction="desc" sort-key="name">
+            Sortable Column
+        </sp-table-head-cell>
+        <sp-table-head-cell>Non-sortable Column</sp-table-head-cell>
+        <sp-table-head-cell>Non-sortable Column</sp-table-head-cell>
+    </sp-table-head>
+</sp-table>
+<script type="module">
+    const initItems = (count) => {
+        const total = count;
+        const items = [];
+        while (count) {
+            count--;
+            items.push({
+                name: String(total - count),
+                date: count,
+            });
+        }
+        return items;
+    }
+
+    let items = initItems(50);
+
+    const initTable = () => {
+        const table = document.querySelector('#sorted-virtualized-table');
+
+        table.items = items;
+
+        table.renderItem = (item, index) => {
+            const cell1 = document.createElement('sp-table-cell');
+            const cell2 = document.createElement('sp-table-cell');
+            const cell3 = document.createElement('sp-table-cell');
+            cell1.textContent = `Row Item Alpha ${item.name}`;
+            cell2.textContent = `Row Item Beta ${item.date}`;
+            cell3.textContent = `Index: ${index}`;
+            return [cell1, cell2, cell3];
+        }
+        table.addEventListener('sorted', (event) => {
+            const { sortDirection, sortKey } = event.detail;
+            items = items.sort((a, b) => {
+                const first = String(a[sortKey]);
+                const second = String(b[sortKey]);
+                return sortDirection === 'asc'
+                    ? first.localeCompare(second)
+                    : second.localeCompare(first);
+            });
+            table.items = [...items];
+        });
+    };
+
+    customElements.whenDefined('sp-table').then(() => {
+        initTable();
+    });
+</script>
+```
+
+<script type="module">
+    const initItems = (count) => {
+        const total = count;
+        const items = [];
+        while (count) {
+            count--;
+            items.push({
+                name: String(total - count),
+                date: count,
+            });
+        }
+        return items;
+    }
+
+    let items = initItems(50);
+
+    const initTable = () => {
+        const table = document.querySelector('#sorted-virtualized-table');
+
+        table.items = items;
+
+        table.renderItem = (item, index) => { 
+            const cell1 = document.createElement('sp-table-cell');
+            const cell2 = document.createElement('sp-table-cell');
+            const cell3 = document.createElement('sp-table-cell');
+            cell1.textContent = `Row Item Alpha ${item.name}`;
+            cell2.textContent = `Row Item Beta ${item.date}`;
+            cell3.textContent = `Index: ${index}`;
+            return [cell1, cell2, cell3];
+        }
+        table.addEventListener('sorted', (event) => {
+            const { sortDirection, sortKey } = event.detail;
+            items = items.sort((a, b) => {
+                const first = String(a[sortKey]);
+                const second = String(b[sortKey]);
+                return sortDirection === 'asc'
+                    ? first.localeCompare(second)
+                    : second.localeCompare(first);
+            });
+            table.items = [...items];
+        });
+    };
+
+    customElements.whenDefined('sp-table').then(() => {
+        initTable();
+    });
+</script>

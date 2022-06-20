@@ -169,7 +169,7 @@ const config = {
                 },
                 {
                     type: 'enum',
-                    name: 'sorted',
+                    name: 'sort-direction',
                     values: [
                         {
                             name: 'asc',

@@ -58,13 +58,13 @@ governing permissions and limitations under the License.
 :host([sortable]) {
     cursor: pointer; /* .spectrum-Table-headCell.is-sortable */
 }
-:host([sorted='asc']) .sortedIcon,
-:host([sorted='desc']) .sortedIcon {
+:host([sort-direction='asc']) .sortedIcon,
+:host([sort-direction='desc']) .sortedIcon {
     display: inline-block; /* .spectrum-Table-headCell.is-sorted-asc .spectrum-Table-sortedIcon,
    * .spectrum-Table-headCell.is-sorted-desc .spectrum-Table-sortedIcon */
     margin-top: calc(var(--spectrum-global-dimension-size-25) * -1);
 }
-:host([sorted='asc']) .sortedIcon {
+:host([sort-direction='asc']) .sortedIcon {
     transform: rotate(
         -90deg
     ); /* .spectrum-Table-headCell.is-sorted-asc .spectrum-Table-sortedIcon */
