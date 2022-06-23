@@ -13,8 +13,9 @@ governing permissions and limitations under the License.
 import { html, TemplateResult } from '@spectrum-web-components/base';
 
 export type Properties = {
+    selected?: [];
     selects?: undefined | 'single' | 'multiple';
-    onChange: (eventData: {
+    onChange?: (eventData: {
         first: number;
         last: number;
         type: string;

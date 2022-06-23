@@ -48,6 +48,8 @@ export class RangeChangedEvent extends Event {
  * @element sp-table
  */
 
+// when table doesn't have a scroller, it should be height auto and
+// the slotted sp table body element should always have overflow visible.
 export class Table extends SpectrumElement {
     public static override get styles(): CSSResultArray {
         return [styles];
@@ -306,12 +308,6 @@ export class Table extends SpectrumElement {
                         this.selected = [...this.selectedSet];
                     }
                     break;
-                    // if you have multiple selected, but selects='single',
-                    // we deselect all cells? hmm...
-                    // EXAMPLE: rows 1, 2, 4 are selected but selects is single.
-                    // we deselect 2 => 1 and 4 are STILL SELECTED. if you want
-                    // to select any item, it's going to deselect all the cells before
-                    // reselecting the cell you just clicked on, as seen above.
                 }
                 case 'multiple': {
                     if (rowItem.selected) {

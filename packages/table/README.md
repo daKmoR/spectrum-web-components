@@ -309,6 +309,23 @@ const renderItem = (item: Item, index: number): TemplateResult => {
 
 `renderItem` is then included as a property of `<sp-table>`, along with the `items`, to render a full `<sp-table>` without excessive manual HTML writing.
 
+You can also render a different cell at a particular index by doing something like below:
+
+```javascript
+const renderItem = (item: Item, index: number): TemplateResult => {
+    if (index === 15) {
+        return html`
+            <sp-table-cell style="text-align: center">Custom Row</sp-table-cell>
+        `;
+    }
+    return html`
+        <sp-table-cell>Row Item ${item.name}</sp-table-cell>
+        <sp-table-cell>Row Item ${item.date}</sp-table-cell>
+        <sp-table-cell>Row Item ${index}</sp-table-cell>
+    `;
+};
+```
+
 Please note that there is a bug when attempting to select all virtualised elements. The items are selected programatically, it's just not reflected visually.
 
 ## Sorting on the Virtualized Table

@@ -140,6 +140,8 @@ class VirtualTable extends SpectrumElement {
 
 customElements.define('virtual-table', VirtualTable);
 
+const virtualItems = makeItemsTwo(50);
+
 export const virtualized = (): TemplateResult => {
     return html`
         <virtual-table></virtual-table>
@@ -147,8 +149,6 @@ export const virtualized = (): TemplateResult => {
 };
 
 export const virtualizedSingle = (args: Properties): TemplateResult => {
-    const virtualItems = makeItemsTwo(50);
-
     const onChange =
         (args.onChange as (eventData: {
             first: number;
@@ -200,8 +200,6 @@ virtualizedSingle.args = {
 };
 
 export const virtualizedMultiple = (args: Properties): TemplateResult => {
-    const virtualItems = makeItemsTwo(50);
-
     const renderItem = (item: Item, index: number): TemplateResult => {
         return html`
             <sp-table-cell>Rowsaa Item Alpha ${item.name}</sp-table-cell>
@@ -244,8 +242,6 @@ virtualizedMultiple.args = {
 };
 
 export const virtualizedCustomValue = (args: Properties): TemplateResult => {
-    const virtualItems = makeItemsTwo(50);
-
     return html`
         <sp-table
             size="m"
