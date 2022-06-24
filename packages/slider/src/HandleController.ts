@@ -15,6 +15,7 @@ import {
     ifDefined,
     styleMap,
 } from '@spectrum-web-components/base/src/directives.js';
+import { MutationController } from '@lit-labs/observers/mutation_controller.js';
 import { Slider } from './Slider.js';
 import {
     Controller,
@@ -61,7 +62,6 @@ export interface HandleValueDictionary {
 }
 
 export class HandleController implements Controller {
-    private observer!: MutationObserver;
     private host!: Slider;
     private handles: Map<string, SliderHandle> = new Map();
     private model: ModelValue[] = [];
@@ -71,6 +71,18 @@ export class HandleController implements Controller {
 
     constructor(host: Slider) {
         this.host = host;
+
+        new MutationController(this.host, {
+            config: {
+                subtree: true,
+                childList: true,
+            },
+            callback: () => {
+                this.extractModelFromLightDom();
+            },
+        });
+
+        this.extractModelFromLightDom();
     }
 
     public get values(): HandleValueDictionary {
@@ -159,11 +171,6 @@ export class HandleController implements Controller {
     };
 
     public hostConnected(): void {
-        if (!this.observer) {
-            this.observer = new MutationObserver(this.extractModelFromLightDom);
-        }
-        this.observer.observe(this.host, { subtree: true, childList: true });
-        this.extractModelFromLightDom();
         if ('orientation' in screen) {
             screen.orientation.addEventListener(
                 'change',
@@ -178,7 +185,6 @@ export class HandleController implements Controller {
     }
 
     public hostDisconnected(): void {
-        this.observer.disconnect();
         if ('orientation' in screen) {
             screen.orientation.removeEventListener(
                 'change',
@@ -451,15 +457,16 @@ export class HandleController implements Controller {
         const offset = event.clientX;
         const size = rect.width;
 
-        const normalized = (offset - minOffset) / size;
-        const value = model.normalization.fromNormalized(
+        const directionalOffset = this.host.isLTR
+            ? offset - minOffset
+            : size - (offset - minOffset);
+        const normalized = directionalOffset / size;
+
+        return model.normalization.fromNormalized(
             normalized,
             model.range.min,
             model.range.max
         );
-
-        /* c8 ignore next */
-        return this.host.isLTR ? value : model.range.max - value;
     }
 
     public renderHandle(

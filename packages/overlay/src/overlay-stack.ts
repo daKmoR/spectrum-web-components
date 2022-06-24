@@ -21,6 +21,8 @@ import {
     findOverlaysRootedInOverlay,
     parentOverlayOf,
 } from './overlay-utils.js';
+import { OverlayCloseEvent } from './overlay-events.js';
+import { getDeepElementFromPoint } from '@spectrum-web-components/shared/src/get-deep-element-from-point.js';
 
 function isLeftClick(event: MouseEvent): boolean {
     return event.button === 0;
@@ -183,19 +185,9 @@ export class OverlayStack {
         event.stopPropagation();
         event.preventDefault();
         await this.closeTopOverlay();
-        let target = document.elementFromPoint(event.clientX, event.clientY);
-        while (target?.shadowRoot) {
-            const innerTarget = (
-                target.shadowRoot as unknown as {
-                    elementFromPoint: (x: number, y: number) => Element | null;
-                }
-            ).elementFromPoint(event.clientX, event.clientY);
-            if (!innerTarget || innerTarget === target) {
-                break;
-            }
-            target = innerTarget;
-        }
-        target?.dispatchEvent(new MouseEvent('contextmenu', event));
+        getDeepElementFromPoint(event.clientX, event.clientY)?.dispatchEvent(
+            new MouseEvent('contextmenu', event)
+        );
     };
 
     private get document(): Document {
@@ -223,8 +215,18 @@ export class OverlayStack {
         this.document.addEventListener('click', this.handleMouseCapture, true);
         this.document.addEventListener('click', this.handleMouse);
         this.document.addEventListener('keyup', this.handleKeyUp);
+        this.document.addEventListener(
+            'sp-overlay-close',
+            this.handleOverlayClose as EventListener
+        );
         window.addEventListener('resize', this.handleResize);
     }
+
+    handleOverlayClose = (event: OverlayCloseEvent): void => {
+        const { root } = event;
+        if (!root) return;
+        this.closeOverlaysForRoot(root);
+    };
 
     private isClickOverlayActiveForTrigger(trigger: HTMLElement): boolean {
         return this.overlays.some(
