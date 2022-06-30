@@ -11,15 +11,19 @@ governing permissions and limitations under the License.
 */
 
 import { html, TemplateResult } from '@spectrum-web-components/base';
+import { Table } from '../';
 
 export type Properties = {
-    selected?: [];
+    selected?: string[] | undefined;
     selects?: undefined | 'single' | 'multiple';
-    onChange?: (eventData: {
-        first: number;
-        last: number;
-        type: string;
-    }) => void;
+    onChange?: (
+        eventData: Event & {
+            target: Table;
+            first: number;
+            last: number;
+            type: string;
+        }
+    ) => void;
 };
 
 export interface Item extends Record<string, unknown> {

@@ -163,7 +163,7 @@ export const virtualizedSingle = (args: Properties): TemplateResult => {
         <sp-table
             size="m"
             selects=${args.selects}
-            .selected=${['0']}
+            .selected=${args.selected}
             @change=${({ target }: Event & { target: Table }) => {
                 const next = target.nextElementSibling as HTMLDivElement;
                 next.textContent = `Selected: ${JSON.stringify(
@@ -197,6 +197,7 @@ export const virtualizedSingle = (args: Properties): TemplateResult => {
 };
 virtualizedSingle.args = {
     selects: 'single',
+    selected: ['49'],
 };
 
 export const virtualizedMultiple = (args: Properties): TemplateResult => {
@@ -247,16 +248,7 @@ export const virtualizedCustomValue = (args: Properties): TemplateResult => {
             size="m"
             selects=${args.selects}
             .selected=${['0', '48', 'applied-47']}
-            @change=${({ target }: Event & { target: Table }) => {
-                const next = target.nextElementSibling as HTMLDivElement;
-                next.textContent = `Selected: ${JSON.stringify(
-                    target.selected,
-                    null,
-                    ' '
-                )}`;
-                const nextNext = next.nextElementSibling as HTMLDivElement;
-                nextNext.textContent = `Selected Count: ${target.selected.length}`;
-            }}
+            @change=${args.onChange}
             .items=${virtualItems}
             .itemValue=${(item: Item) => 'applied-' + item.date}
             .renderItem=${renderItem}
@@ -274,4 +266,14 @@ export const virtualizedCustomValue = (args: Properties): TemplateResult => {
 };
 virtualizedCustomValue.args = {
     selects: 'multiple',
+    onChange: ({ target }: Event & { target: Table }) => {
+        const next = target.nextElementSibling as HTMLDivElement;
+        next.textContent = `Selected: ${JSON.stringify(
+            target.selected,
+            null,
+            ' '
+        )}`;
+        const nextNext = next.nextElementSibling as HTMLDivElement;
+        nextNext.textContent = `Selected Count: ${target.selected.length}`;
+    },
 };
