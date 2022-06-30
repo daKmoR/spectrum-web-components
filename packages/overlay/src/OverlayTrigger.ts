@@ -49,6 +49,12 @@ export const LONGPRESS_INSTRUCTIONS = {
     keyboard: 'Press Space or Alt+Down Arrow for additional options',
     mouse: 'Click and hold for additional options',
 };
+
+export type OverlayTriggerInteractions = Extract<
+    TriggerInteractions,
+    'inline' | 'modal' | 'replace'
+>;
+
 /**
  * @element overlay-trigger
  *
@@ -77,7 +83,7 @@ export class OverlayTrigger extends SpectrumElement {
     public placement: Placement = 'bottom';
 
     @property()
-    public type?: Extract<TriggerInteractions, 'inline' | 'modal' | 'replace'>;
+    public type?: OverlayTriggerInteractions;
 
     @property({ type: Number, reflect: true })
     public offset = 6;
