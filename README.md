@@ -11,7 +11,7 @@ To this end, Spectrum Web Components only targets _modern_, evergreen browsers t
 -   Browsers with Custom Elements V1 and Shadow DOM support, e.g. Chrome, Firefox, Safari, Edge (79+)
     -   Or appropriate [polyfills](https://github.com/webcomponents/webcomponentsjs) in older browsers.
 
-# Getting started
+# Getting started FIXED
 
 ```bash
 git clone https://github.com/adobe/spectrum-web-components.git
